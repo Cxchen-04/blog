@@ -177,15 +177,15 @@ home_banner:
   # Home banner social links
   social_links:
     # Whether to enable
-    enable: false
+    enable: true
     # Social links style
     style: default # default, reverse, center
     # Social links
     links:
-      github:  # your GitHub URL
-      instagram: # your Instagram URL
+      github: https://github.com/Cxchen-04 # your GitHub URL
+      instagram:  https://www.instagram.com/luelueyy?igsh=NWtiajh3aHhhc2d3&utm_source=qr # your Instagram URL
       zhihu:  # your ZhiHu URL
-      twitter:  # your twitter URL
+      twitter:  https://x.com/lueluelue6474?s=21 # your twitter URL
       email: cxchen628@gmail.com # your email
       # ...... # you can add more
     # Social links with QRcode drawers
@@ -219,14 +219,20 @@ navbar:
       path: / 
       icon: fa-regular fa-house # can be empty
     March:
-      icon: 
-      path: /March
+      icon: fa-solid fa-image
+      path: /March/
     Archives: 
       path: /archives 
       icon: fa-regular fa-archive # can be empty
-    Status: 
-      path: https://status.ohevan.com/
-      icon: fa-regular fa-chart-bar
+    Categories: #取名随意
+      icon: fa-solid fa-folder #图标
+      path: /categories/ 
+    Tags: #取名随意
+      icon: fa-solid fa-tags #图标
+      path: /tags/ #链接
+    # Status: 
+    #   path: https://status.ohevan.com/
+    #   icon: fa-regular fa-chart-bar
     # About: 
     #   icon: fa-regular fa-user
     #   submenus:
@@ -261,15 +267,18 @@ home:
     announcement: # Announcement text
     show_on_mobile: true # Whether to show sidebar navigation on mobile sheet menu
     links:
-      # Archives: 
-      #   path: /archives 
-      #   icon: fa-regular fa-archive # can be empty
-      # Tags: 
-      #   path: /tags 
-      #   icon: fa-regular fa-tags # can be empty
-      # Categories: 
-      #   path: /categories 
-      #   icon: fa-regular fa-folder # can be empty
+      Archives: 
+        path: /archives 
+        icon: fa-regular fa-archive # can be empty
+      Tags: 
+        path: /tags 
+        icon: fa-regular fa-tags # can be empty
+      Categories: 
+        path: /categories 
+        icon: fa-regular fa-folder # can be empty
+      March:
+        icon: fa-solid fa-image
+        path: /March/
       # ...... # you can add more
   # Article date format
   article_date_format: auto # auto, relative, YYYY-MM-DD, YYYY-MM-DD HH:mm:ss etc.
