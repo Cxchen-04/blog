@@ -1,5 +1,5 @@
 ---
-title: 相册
+title: album
 date: 2025-03-25 13:22:20
-template: album
+template: Album
 ---
