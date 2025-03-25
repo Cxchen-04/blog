@@ -13,7 +13,7 @@ info:
   # Site title
   title: 月的心会痛
   # Site subtitle
-  subtitle: 
+  subtitle: 🌙
   # Author name
   author: 神秘路痴
   # Site URL
@@ -190,7 +190,7 @@ home_banner:
       # ...... # you can add more
     # Social links with QRcode drawers
     qrs:
-      weixin: /images/wechat.jpg # your Wechat QRcode image URL
+      weixin: /images/wechat.png # your Wechat QRcode image URL
       # ...... # you can add more
 # HOME BANNER <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< end
 
