@@ -218,9 +218,9 @@ navbar:
     Home: 
       path: / 
       icon: fa-regular fa-house # can be empty
-    March:
+    Album:
       icon: fa-solid fa-image
-      path: /March/
+      path: /Album/
     Archives: 
       path: /archives 
       icon: fa-regular fa-archive # can be empty
@@ -276,9 +276,9 @@ home:
       Categories: 
         path: /categories 
         icon: fa-regular fa-folder # can be empty
-      March:
+      Album:
         icon: fa-solid fa-image
-        path: /March/
+        path: /Album/
       # ...... # you can add more
   # Article date format
   article_date_format: auto # auto, relative, YYYY-MM-DD, YYYY-MM-DD HH:mm:ss etc.
