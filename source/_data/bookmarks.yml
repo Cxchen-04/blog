@@ -6,18 +6,45 @@
 #       description: 书签描述
 #       image: 图标链接 # 从 icon 改为 image，用于显示网站图标
  
-- category: 工具
+- category: AI工具
   icon: fa-tools # 工具分类的图标
   items:
     - name: Deepseek
       link: https://chat.deepseek.com
-      description: 国人研发，超牛推理模型。
+      description: 杭州深度求索公司的智能助手。国人研发，超牛推理模型。
       image: https://chat.deepseek.com/favicon.svg
+
     - name: ChatGPT
       link: https://chat.openai.com # 书签链接地址
       description: OpenAI 的 AI 对话助手
-      image: https://chat.openai.com/favicon.ico # 网站图标地址
+      image: /images/openai.png # 网站图标地址
+
     - name: Claude
       link: https://www.anthropic.com/
       description: Anthropic 的 AI 对话助手
       image: https://www.anthropic.com/favicon.ico
+
+    - name: Gemini
+      link: https://gemini.google.com/
+      description: Google 的 AI 对话助手 目前不支持国区
+      image: /images/gemini.png
+
+    - name: Grok
+      link: https://grok.com/
+      description:  马斯克旗下公司的 AI 对话助手
+      image: /images/grok.png
+
+    - name: 豆包
+      link: https://www.doubao.com/
+      description: 字节跳动旗下 的 AI 智能助手
+      image: https://lf-flow-web-cdn.doubao.com/obj/flow-doubao/doubao/logo-doubao-overflow.png
+
+    - name: Kimi
+      link: https://kimi.moonshot.cn/
+      description: 北京月之暗面科技有限公司 的 AI 智能助手
+      image: https://statics.moonshot.cn/kimi-chat/favicon.ico
+
+    - name: Coze
+      link: https://www.coze.cn/
+      description: 字节跳动在海外推出的一个AI聊天机器人和应用开发平台
+      image: https://lf-coze-web-cdn.coze.cn/obj/coze-web-cn/obric/coze/favicon.1970.png

@@ -82,7 +82,7 @@ global:
     scale: false # scale effect
   # Scroll progress
   scroll_progress:
-    bar: true # progress bar
+    bar: false # progress bar
     percentage: true # percentage
   # Website counter
   website_counter:
@@ -218,18 +218,21 @@ navbar:
     Home: 
       path: / 
       icon: fa-regular fa-house # can be empty
-    Album:
+    相册:
       icon: fa-solid fa-image
       path: /Album/
     Archives: 
       path: /archives 
       icon: fa-regular fa-archive # can be empty
-    Categories: #取名随意
+    分类: #取名随意
       icon: fa-solid fa-folder #图标
       path: /categories/ 
-    Tags: #取名随意
-      icon: fa-solid fa-tags #图标
-      path: /tags/ #链接
+    # 标签: #取名随意
+    #   icon: fa-solid fa-tags #图标
+    #   path: /tags/ #链接
+    书签:
+      icon: fa-solid fa-bookmark
+      path: /bookmarks/
     # Status: 
     #   path: https://status.ohevan.com/
     #   icon: fa-regular fa-chart-bar
@@ -267,16 +270,16 @@ home:
     announcement: # Announcement text
     show_on_mobile: true # Whether to show sidebar navigation on mobile sheet menu
     links:
-      Archives: 
+      归档: 
         path: /archives 
         icon: fa-regular fa-archive # can be empty
-      Tags: 
+      标签: 
         path: /tags 
         icon: fa-regular fa-tags # can be empty
-      Categories: 
+      分类: 
         path: /categories 
         icon: fa-regular fa-folder # can be empty
-      Album:
+      相册:
         icon: fa-solid fa-image
         path: /Album/
       书签:

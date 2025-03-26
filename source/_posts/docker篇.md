@@ -48,7 +48,7 @@ docker-engine
 $ curl -fsSL https://get.docker.com -o get-docker.sh
 $ sudo sh get-docker.sh
 ```
-
+<!--                                                      -->
 2.使用仓库安装(推荐)
 2.1设置docker仓库
 ``` Bash centOS
@@ -64,14 +64,30 @@ https://download.docker.com/linux/centos/docker-ce.repo
 $ sudo yum install docker-ce docker-ce-cli container.io
  # 安装最新的Docker CE版本
 $ yum list docker-ce --showduplicates | sort -r
+$ sudo yum install docker-ce-<VERSION_STRING> docker-ce-cli-<VERSION_STRING> container.io
+#说明：<VERSION_STRING>，取上图中第二列中的第一个：或第一个数字到-之间的字符串，如18.09.6、18.06.2.ce等。
+```
+<!--                                                         -->
+3.使用RPM程序包安装（适用于没有互联网接入的情况）
+3.1下载所需要的Docker版本
+下载地址： https://download.docker.com/linux/centos/7/x86_64/stable/Packages/
+``` Bash centOS
+$ sudo yum install /path/to/package.rpm
+# 其中/path/to/package.rpm,为你下载下来的rpm包所在位置和文件名称
+$ sudo systemctl start docker
+# 启动Docker
+$ sudo docker run hello-world
+# 验证安装是否正确
 ```
 更多信息: [Centos安装docker](https://www.coonote.com/docker/centos-install-docker.html)
+
+
 
 
 ### Ubuntu安装docker
 Docker 需要在64位版本的Ubuntu上安装。此外，你还需要保证你的 Ubuntu 内核的最小版本不低于 3.10，其中3.10 小版本和更新维护版也是可以使用的。
 
-``` Bash centOS
+``` Bash Ubuntu
 $ uname -r 
 3.11.0-15-generic
 ```
@@ -108,13 +124,13 @@ $ brew cask install docker
 
 ## 使用docker
 
-``` bash 
+``` bash docker
 $ hexo server
 ```
 
 更多信息: [服务端](https://hexo.io/docs/server.html)
 
-## 生成静态文件
+## Docker Dockerfile
 
 ``` macOS
 $ hexo generate
@@ -122,7 +138,7 @@ $ hexo generate
 
 更多信息: [生成](https://hexo.io/docs/generating.html)
 
-## 部署到远程仓库
+## Docker Compose
 
 ``` windows
 $ hexo deploy
