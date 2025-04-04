@@ -155,25 +155,145 @@ Blackbox 网站状态：导入模板 ID 7587
 
 ## 使用
 
-#### grafana更改中文
+### grafana更改中文
 要将Grafana配置为中文，你可以参照以下步骤进行操作
-1.打开grafana的默认配置文件：/opt/bitnami/grafana/conf/defaults.ini
-<i>如果不知道安装到哪里了可以用which查找一下</i>
-
-``` bash Ubuntu
-which grafana-server #查找一下
-# /usr/sbin/grafana-server
-```
-
-2.在该文件中，找到default_language这一行，将en-US改为zh-Hans。这样grafana的语言就会更改为中文。
-3.保存并关闭文件
-4.重启服务刷新网页即可
+1. 打开grafana的默认配置文件：/opt/bitnami/grafana/conf/defaults.ini
+                          /usr/share/grafana/conf/defaults.ini
+2. 在该文件中，找到default_language这一行，将en-US改为zh-Hans。这样grafana的语言就会更改为中文。
+3. 保存并关闭文件
+4. 启服务刷新网页即可
 ``` bash
 systemctl restart grafana-server
 ```
 
-### 运行服务器
-
-``` bash
-$ hexo server
+### 监控告警
+#### 🛠️ 步骤一：设置 Prometheus 告警规则
+Prometheus 支持基于查询的告警规则，你可以通过 PromQL 设置条件，比如当系统负载过高时发出告警。
+1. 创建告警规则文件
+在 Prometheus 配置目录下创建一个 alert.rules 文件（如果没有的话）：
+``` bash Ubuntu
+nano /etc/prometheus/alert.rules 
+# 看你prometheus安装/解压到了哪里
 ```
+2. 在文件中加入告警规则，例如：
+``` bash Yaml
+groups:
+  - name: node_alerts
+    rules:
+    - alert: HighCPUUsage 
+      expr: 100 * (1 - avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[1m]))) > 80
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "CPU usage is above 80% on {{ $labels.instance }}"
+        description: "CPU usage is above 80% for 5 minutes on {{ $labels.instance }}."
+        
+    - alert: HighLoadAverage
+      expr: node_load1 > 2
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "High load average on {{ $labels.instance }}"
+        description: "The 1-minute load average is above 2 on {{ $labels.instance }}."
+```
+HighCPUUsage：当 CPU 使用率超过 80% 持续 5 分钟时，触发告警。
+HighLoadAverage：当系统 1 分钟平均负载超过 2 时，触发告警。
+2. 修改 Prometheus 配置文件，加载告警规则
+编辑 Prometheus 配置文件 prometheus.yml，加入规则文件：
+``` bash Ubuntu
+rule_files:
+  - "/etc/prometheus/alert.rules"
+```
+3. 重新启动 Prometheus
+
+修改完配置后，重新启动 Prometheus 服务来应用告警规则：
+``` bash
+sudo systemctl restart prometheus
+```
+#### 🛠️ 步骤二：配置 Grafana 告警通知
+
+一旦 Prometheus 设置了告警规则，你就可以在 Grafana 中查看告警并设置通知。
+
+1. 设置通知渠道
+
+首先需要在 Grafana 配置一个通知渠道，常用的有 邮件、钉钉、Slack 等。
+
+配置邮件通知
+	1.	打开 Grafana UI，进入 “Alerting” > “Notification channels”。
+	2.	点击 “Add channel”。
+	3.	选择通知方式（比如 Email）并填写相关信息：
+	•	Email Address：收件人邮箱
+	•	SMTP：配置发送邮件的 SMTP 服务（如 Gmail 或自己配置的 SMTP）
+
+配置钉钉/Slack 通知
+
+你可以选择使用钉钉或 Slack 的 Webhook，步骤类似，直接填写 Webhook URL。
+
+2. 配置告警规则
+
+在 Grafana 中，进入你要监控的 Dashboard，并进行告警设置：
+	1.	打开需要设置告警的图表，点击图表右上角的 “Alert” 标签。
+	2.	配置告警条件，比如：
+	•	当系统负载超过某个阈值。
+	•	配置告警时间（比如 5 分钟内触发）。
+	3.	在 “Notifications” 部分，选择之前配置好的通知渠道（比如 Email、钉钉等）。
+
+3. 保存告警设置
+
+设置完成后，点击 “Save” 来保存告警规则。Grafana 会根据你设置的条件，定期检查，并在触发告警时通过邮件或钉钉等渠道发送通知。
+#### 🧑‍💻 步骤三：验证告警是否有效
+1. 要让 Grafana 能通过 SMTP 发送邮件告警通知，你需要配置它的 smtp 邮件发送服务。以Gmail为例
+  
+| 配置项         | 示例（以 Gmail 为例）              |
+|----------------|-------------------------------------|
+| SMTP 服务器地址 | smtp.gmail.com                      |
+| 端口号         | 587 (TLS) / 465 (SSL)               |
+| 发件邮箱       | yourname@gmail.com                  |
+| 发件邮箱密码   | Gmail 生成的“应用专用密码”         |
+| 接收人邮箱     | 任意你想收到告警的人邮箱地址       |
+
+1. 修改 Grafana 配置文件 grafana.ini
+默认路径通常是：
+``` bash
+nano /etc/grafana/grafana.ini
+```
+找到以下配置段落，把它修改成你的信息（注意取消注释）：
+``` bash ini
+#################################### SMTP / Emailing ##########################
+[smtp]
+enabled = true
+host = smtp.gmail.com:587
+user = yourname@gmail.com
+password = your_app_password   ; # Gmail 需要使用“应用专用密码”而不是登录密码
+;cert_file =
+;key_file =
+skip_verify = false
+from_address = yourname@gmail.com
+from_name = Grafana Monitor
+
+[emails]
+;welcome_email_on_sign_up = false
+```
+💡如果你使用的是 QQ 邮箱、阿里邮箱、163 等都可以，改下 host、端口、密码即可
+3. 🔐 关于 Gmail 的“应用专用密码”：
+	1.	登录你的 Gmail 账号
+	2.	打开： https://myaccount.google.com/security
+	3.	开启 两步验证
+	4.	找到“应用专用密码”，创建一个密码用于 Grafana 发送邮件
+	5.	拷贝该密码，贴到上面 password 一栏中
+4. 🔄重启 Grafana 服务
+配置改好之后需要重启 Grafana 才能生效：
+``` bash
+sudo systemctl restart grafana-server
+```
+1. ✉️在 Grafana 中测试发送邮件
+	1.	登录 Grafana → 左侧点击 “Alerting” → “Contact points”
+	2.	创建一个新的 Email 通知方式
+	3.	输入你希望接收告警的邮箱地址
+	4.	保存后点击 “Send test notification” 来验证是否能收到邮件
+
+✅ 如果设置成功，你应该会在邮箱里看到一个测试邮件！
+
+🎉 完成！
