@@ -193,18 +193,221 @@ https://docker.fxxk.dedyn.io/
 ### 常用的操作命令
 
 ## Docker Dockerfile
+### ✅ 一、什么是 Dockerfile？
+Dockerfile 是一套“食谱”，告诉 Docker 如何构建你的镜像。
+通过它，你可以：
+	•	指定用哪个基础镜像（比如 Python、Node、Nginx）
+	•	安装依赖
+	•	拷贝文件
+	•	执行命令
+	•	设置运行服务时的默认命令
+### ✅ 二、Dockerfile 语法结构（超清晰版）
+``` Dockerfile
+# 1. 指定基础镜像（必须有）
+FROM 镜像名[:tag]
 
-``` macOS
-hexo generate
+# 2. 设置容器中的工作目录（可选）
+WORKDIR /app
+
+# 3. 拷贝文件到镜像中
+COPY ..
+
+# 4. 安装依赖（可多条RUN）
+RUN 命令
+
+# 5. 设置环境变量（可选）
+ENV 变量名=值
+
+# 6. 设置容器启动时执行的命令
+CMD ["命令","参数"]
+
+# 7. 设置暴露的端口（可选，用于文档提升）
+EXPOSE 端口号
 ```
+### ✅ 三、最常见的语句详解 + 示例
+| 指令     | 示例                          | 说明                             |
+|----------|-------------------------------|----------------------------------|
+| FROM     | FROM node:18                  | 基础镜像                         |
+| WORKDIR  | WORKDIR /app                  | 切换目录（类似 cd）              |
+| COPY     | COPY . .                      | 将当前目录复制到容器里           |
+| RUN      | RUN npm install              | 构建期间执行命令                 |
+| CMD      | CMD ["npm", "start"]         | 容器启动时运行（只能有一条）     |
+| EXPOSE   | EXPOSE 3000                   | 说明服务监听的端口（仅文档提示） |
+### ✅ 四、实战示例：Flask Web App
+📁 项目结构：
+``` bash
+my-flask-app/
+├── app.py
+├── requirements.txt
+└── Dockerfile
+```
+📄 app.py：
+``` python
+from flask import Flask
+app = Flask(__name__)
 
-更多信息: [生成](https://hexo.io/docs/generating.html)
+@app.route("/")
+def home():
+    return "Hello,Docker!"
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0",port=5000)
+```
+📄 requirements.txt：
+``` bash
+flask
+```
+📄 Dockerfile：
+``` Dockerfile
+FROM python:3.9-slim
+WORKDIR /app
+COPY ..
+RUN pip install -r requirements.txt
+EXPOSE 5000
+CMD ["python","app.py"]
+```
+🛠 构建镜像并运行：
+``` bash
+docker build -t my-flask-app .
+docker run -d -p 5000:5000 my-flask-app
+```
+浏览器访问：http://localhost:5000
+🎉 成功！
+### ✅ 五、常见问题与技巧
+| 问题           | 原因与解决方式                                               |
+|----------------|--------------------------------------------------------------|
+| 容器运行后马上退出 | CMD 写错或服务没启动                                         |
+| 镜像太大         | 换用 `-slim`、`-alpine` 镜像                                 |
+| 文件没拷进去     | COPY 路径写错、`.dockerignore` 把它排除了                    |
+| 构建慢           | 用 `.dockerignore` 排除不必要的文件（比如 `node_modules`） |
+
+### ✅ 六、Dockerfile 小技巧合集
+``` Dockerfile
+# 编译阶段
+FROM node:18 as build
+WORKDIR /app
+COPY ..
+RUN nom install && npm run build
+
+# 部署阶段（nginx）
+FROM nginx
+COPY --from=build /app/dist /usr/share/nginx/html
+
+#设置环境变量
+ENV PORT=8080
+```
+### ✅ 最后送你一句口诀 🧠
+<b>FROM 定基础，WORKDIR 定位置，COPY 拷代码，RUN 装环境，CMD 启动它。</b>
+
+
 
 ## Docker Compose
+### ✅ 一、Docker Compose是什么？
+他是一个docker-compose.yml文件：
+	•	描述多个服务（比如 web、db、redis）
+	•	指定端口、挂载、网络、环境变量等
+	•	一条命令就能启动：docker-compose up
+### ✅ 二、基本语法结构
+```Yaml
+version: '3'    #Compose文件版本,一般用‘3’或‘3.8’
 
-``` windows
-hexo deploy
+services:       #定义所有容器服务
+    服务名1:
+        image: 镜像名 或 buld路径
+        ports:
+            - "本地端口：容器端口"
+        volumes:
+            - "本地路径：容器路径"
+        environment:
+            - "变量名=值"
+        depends_on:
+            - 其他服务名（启动顺序）
+
+    服务名2:
+        ....
+```
+### ✅ 三、最简单示例：部署一个带自定义挂载的 Nginx
+```Yaml
+my-compose-project/
+├── docker-compose.yml
+├── html/
+│   └── index.html
+└── nginx.conf
+```
+📄 docker-compose.yml 内容：
+```Yaml
+version: '3'
+services:
+  web:
+    image: nginx
+    ports:
+      - "8080:80"
+    volumes:
+      - ./html:/usr/share/nginx/html:ro
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+```
+📌说明：
+	•	端口映射：8080 → 容器内80
+	•	挂载本地 ./html 到 nginx 的网页根目录
+	•	挂载本地配置文件替换默认 nginx 配置
+✅ 启动：
+```bash Ubuntu
+docker-compose up -d # 或者 docker compose up -d
+```
+✅ 停止：
+```bash Ubuntu
+docker-compose down -v # 或者 docker compose down -v
+```
+### ✅ 四、多服务组合示例（Node.js + MongoDB）
+```Yaml
+version: '3'
+
+services:
+    app:
+        build: .
+        ports:
+            - "3000:3000"
+        environment:
+            - MONGO_URL=mongodb://mongo:27017/mydb
+        depends_on:
+            - mongo
+    
+    mongo:
+        image: mongo
+        ports:
+            - "27017:27017"
+```
+📌说明：
+	•	app 服务用 Dockerfile 构建
+	•	依赖 Mongo 容器，并通过服务名 mongo 进行连接
+### ✅ 五、常见字段说明（适合记住）
+| 字段           | 用法                                              |
+|----------------|---------------------------------------------------|
+| image:         | 使用已有镜像                                      |
+| build:         | 用 Dockerfile 构建镜像                            |
+| ports:         | 本地端口:容器端口                                 |
+| volumes:       | 本地路径:容器路径                                 |
+| environment:   | 设置环境变量                                      |
+| depends_on:    | 设置服务启动顺序                                  |
+| restart:       | 容器崩溃时是否自动重启（如 always、on-failure）  |
+| networks:      | 设置自定义网络（可多个服务通信）                  |
+
+### ✅ 六、实用命令大全
+```bash Ubuntu
+# 启动服务
+docker-compose up -d # 或者 docker compose up -d
+
+# 停止并删除容器
+docker-compose down # 或者 docker compose down
+
+# 查看运行日志
+docker-compose logs # 或者 docker compose logs
+
+# 查看服务状态
+docker-compose ps # 或者 docker compose ps
+
+# 进入容器
+docker-compose exec 服务名 bash # 或者 docker compose exec 服务名 bash
 ```
 
-更多信息: [部署](https://hexo.io/docs/one-command-deployment.html)
 

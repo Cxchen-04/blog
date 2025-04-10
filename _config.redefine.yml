@@ -220,7 +220,7 @@ navbar:
       icon: fa-regular fa-house # can be empty
     关于我:
       icon: fa-solid fa-user
-      path: /2025/04/4/author/
+      path: /2025/04/04/author/
     相册:
       icon: fa-solid fa-image
       path: /Album/
