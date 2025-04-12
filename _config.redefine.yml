@@ -218,15 +218,15 @@ navbar:
     Home: 
       path: / 
       icon: fa-regular fa-house # can be empty
-    关于我:
-      icon: fa-solid fa-user
-      path: /2025/04/04/author/
-    相册:
-      icon: fa-solid fa-image
-      path: /Album/
-    Archives: 
-      path: /archives 
-      icon: fa-regular fa-archive # can be empty
+    # 关于我:
+    #   icon: fa-solid fa-user
+    #   path: /2025/04/04/author/
+    # 相册:
+    #   icon: fa-solid fa-image
+    #   path: /Album/
+    # Archives: 
+    #   path: /archives 
+    #   icon: fa-regular fa-archive # can be empty
     分类: #取名随意
       icon: fa-solid fa-folder #图标
       path: /categories/ 
@@ -273,18 +273,18 @@ home:
     announcement: # Announcement text
     show_on_mobile: true # Whether to show sidebar navigation on mobile sheet menu
     links:
-      归档: 
-        path: /archives 
-        icon: fa-regular fa-archive # can be empty
+      # 归档: 
+      #   path: /archives 
+      #   icon: fa-regular fa-archive # can be empty
       标签: 
         path: /tags 
         icon: fa-regular fa-tags # can be empty
       分类: 
         path: /categories 
         icon: fa-regular fa-folder # can be empty
-      相册:
-        icon: fa-solid fa-image
-        path: /Album/
+      # 相册:
+      #   icon: fa-solid fa-image
+      #   path: /Album/
       书签:
         icon: fa-solid fa-bookmark
         path: /bookmarks/
