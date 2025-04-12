@@ -32,5 +32,5 @@ jobs:
             SSH_PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
             REMOTE_USER: root
             REMOTE_HOST: 47.242.175.167
-            TARGET: /var/www/html/public
+            TARGET: /var/www/html
             SORUCE: public/
