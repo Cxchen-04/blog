@@ -1,0 +1,36 @@
+name: 部署博客到阿里云服务器
+
+on:
+  push:
+    branches:
+       - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+        - name: 拉取代码
+          uses: actions/checkout@v3
+
+        - name: 安装Node.js
+          uses: actions/setup-node@v3
+          with:
+            node-version: 18
+          
+        - name: 安装Hexo依赖
+          run: |
+            npm install
+        
+        - name: 构建博客
+          run: |
+            npx hexo generate
+        
+        - name: 上传到服务器
+          uses: easingthemes/ssh-deploy@v2.1.5
+          with:
+            SSH_PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
+            REMOTE_USER: root
+            SERVER_IP: 47.242.175.167
+            TARGET: /var/www/html/public
+            SORUCE: public/
