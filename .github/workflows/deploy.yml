@@ -25,7 +25,9 @@ jobs:
         # - name: 构建博客
         #   run: |
         #     npx hexo generate
-        
+        - name: 查看构建结果文件夹
+          run: ls -al public/
+
         - name: 上传到服务器
           uses: easingthemes/ssh-deploy@v2.1.5
           with:

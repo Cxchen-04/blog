@@ -1,5 +1,5 @@
 ---
-title: docker
+title: Docker
 date: 2025-03-25 11:57:28
 tags: [服务端,docker]
 categories: [服务端, docker]
@@ -193,7 +193,7 @@ https://docker.fxxk.dedyn.io/
 ### 常用的操作命令
 
 ## Docker Dockerfile
-### ✅ 一、什么是 Dockerfile？
+### 一、什么是 Dockerfile？
 Dockerfile 是一套“食谱”，告诉 Docker 如何构建你的镜像。
 通过它，你可以：
 	•	指定用哪个基础镜像（比如 Python、Node、Nginx）
@@ -201,7 +201,7 @@ Dockerfile 是一套“食谱”，告诉 Docker 如何构建你的镜像。
 	•	拷贝文件
 	•	执行命令
 	•	设置运行服务时的默认命令
-### ✅ 二、Dockerfile 语法结构（超清晰版）
+### 二、Dockerfile 语法结构（超清晰版）
 ``` Dockerfile
 # 1. 指定基础镜像（必须有）
 FROM 镜像名[:tag]
@@ -224,7 +224,7 @@ CMD ["命令","参数"]
 # 7. 设置暴露的端口（可选，用于文档提升）
 EXPOSE 端口号
 ```
-### ✅ 三、最常见的语句详解 + 示例
+### 三、最常见的语句详解 + 示例
 | 指令     | 示例                          | 说明                             |
 |----------|-------------------------------|----------------------------------|
 | FROM     | FROM node:18                  | 基础镜像                         |
@@ -233,7 +233,7 @@ EXPOSE 端口号
 | RUN      | RUN npm install              | 构建期间执行命令                 |
 | CMD      | CMD ["npm", "start"]         | 容器启动时运行（只能有一条）     |
 | EXPOSE   | EXPOSE 3000                   | 说明服务监听的端口（仅文档提示） |
-### ✅ 四、实战示例：Flask Web App
+### 四、实战示例：Flask Web App
 📁 项目结构：
 ``` bash
 my-flask-app/
@@ -273,7 +273,7 @@ docker run -d -p 5000:5000 my-flask-app
 ```
 浏览器访问：http://localhost:5000
 🎉 成功！
-### ✅ 五、常见问题与技巧
+### 五、常见问题与技巧
 | 问题           | 原因与解决方式                                               |
 |----------------|--------------------------------------------------------------|
 | 容器运行后马上退出 | CMD 写错或服务没启动                                         |
@@ -281,7 +281,7 @@ docker run -d -p 5000:5000 my-flask-app
 | 文件没拷进去     | COPY 路径写错、`.dockerignore` 把它排除了                    |
 | 构建慢           | 用 `.dockerignore` 排除不必要的文件（比如 `node_modules`） |
 
-### ✅ 六、Dockerfile 小技巧合集
+### 六、Dockerfile 小技巧合集
 ``` Dockerfile
 # 编译阶段
 FROM node:18 as build
@@ -296,18 +296,18 @@ COPY --from=build /app/dist /usr/share/nginx/html
 #设置环境变量
 ENV PORT=8080
 ```
-### ✅ 最后送你一句口诀 🧠
+### 最后送你一句口诀 🧠
 <b>FROM 定基础，WORKDIR 定位置，COPY 拷代码，RUN 装环境，CMD 启动它。</b>
 
 
 
 ## Docker Compose
-### ✅ 一、Docker Compose是什么？
+### 一、Docker Compose是什么？
 他是一个docker-compose.yml文件：
 	•	描述多个服务（比如 web、db、redis）
 	•	指定端口、挂载、网络、环境变量等
 	•	一条命令就能启动：docker-compose up
-### ✅ 二、基本语法结构
+### 二、基本语法结构
 ```Yaml
 version: '3'    #Compose文件版本,一般用‘3’或‘3.8’
 
@@ -326,7 +326,7 @@ services:       #定义所有容器服务
     服务名2:
         ....
 ```
-### ✅ 三、最简单示例：部署一个带自定义挂载的 Nginx
+### 三、最简单示例：部署一个带自定义挂载的 Nginx
 ```Yaml
 my-compose-project/
 ├── docker-compose.yml
@@ -358,7 +358,7 @@ docker-compose up -d # 或者 docker compose up -d
 ```bash Ubuntu
 docker-compose down -v # 或者 docker compose down -v
 ```
-### ✅ 四、多服务组合示例（Node.js + MongoDB）
+### 四、多服务组合示例（Node.js + MongoDB）
 ```Yaml
 version: '3'
 
@@ -380,7 +380,7 @@ services:
 📌说明：
 	•	app 服务用 Dockerfile 构建
 	•	依赖 Mongo 容器，并通过服务名 mongo 进行连接
-### ✅ 五、常见字段说明（适合记住）
+### 五、常见字段说明（适合记住）
 | 字段           | 用法                                              |
 |----------------|---------------------------------------------------|
 | image:         | 使用已有镜像                                      |
@@ -392,7 +392,7 @@ services:
 | restart:       | 容器崩溃时是否自动重启（如 always、on-failure）  |
 | networks:      | 设置自定义网络（可多个服务通信）                  |
 
-### ✅ 六、实用命令大全
+### 六、实用命令大全
 ```bash Ubuntu
 # 启动服务
 docker-compose up -d # 或者 docker compose up -d
