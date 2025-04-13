@@ -16,7 +16,7 @@
 
     - name: ChatGPT
       link: https://chat.openai.com # 书签链接地址
-      description: OpenAI 的 AI 对话助手
+      description: OpenAI 的 AI 对话助手。DALL3绘画,各种插好用插件,费用较高。
       image: /images/openai.png # 网站图标地址
 
     - name: Claude
