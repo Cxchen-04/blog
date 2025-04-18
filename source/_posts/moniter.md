@@ -83,7 +83,7 @@ cd prometheus-2.50.0.linux-amd64
 nano prometheus.yml # 创建prometheus配置文件
 ```
 写入一下内容：
-``` bash Ubuntu
+``` Yaml
 global:         # 一定要写正确格式，包括空格以及重复定义
   scrape_interval: 15s
 
@@ -176,7 +176,7 @@ nano /etc/prometheus/alert.rules
 # 看你prometheus安装/解压到了哪里
 ```
 2. 在文件中加入告警规则，例如：
-``` bash Yaml
+```  Yaml
 groups:
   - name: node_alerts
     rules:
@@ -260,7 +260,7 @@ sudo systemctl restart prometheus
 nano /etc/grafana/grafana.ini
 ```
 找到以下配置段落，把它修改成你的信息（注意取消注释）：
-``` bash ini
+``` bash
 #################################### SMTP / Emailing ##########################
 [smtp]
 enabled = true

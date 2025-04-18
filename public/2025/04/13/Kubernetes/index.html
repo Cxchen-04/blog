@@ -30,8 +30,10 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://www.luelulu.com/images/redefine-og.webp">
 <meta property="article:published_time" content="2025-04-13T07:19:50.000Z">
-<meta property="article:modified_time" content="2025-04-13T10:28:29.333Z">
+<meta property="article:modified_time" content="2025-04-18T06:46:52.009Z">
 <meta property="article:author" content="神秘路痴">
+<meta property="article:tag" content="运维">
+<meta property="article:tag" content="k8s">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://www.luelulu.com/images/redefine-og.webp">
     
@@ -298,11 +300,11 @@
 
         <div class="statistics flex justify-around my-2.5">
     <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/tags">
-        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">6</div>
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">7</div>
         <div class="label text-third-text-color text-sm">标签</div>
     </a>
     <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/categories">
-        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">7</div>
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">8</div>
         <div class="label text-third-text-color text-sm">分类</div>
     </a>
     <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/archives">
@@ -328,8 +330,12 @@
 
 		<div class="article-title relative w-full">
 			
-			<div class="w-full flex items-center pt-6 justify-start">
-				<h1 class="article-title-regular text-second-text-color tracking-tight text-4xl md:text-6xl font-semibold px-2 sm:px-6 md:px-8 py-3">Kubernetes / K8s</h1>
+			
+			
+			<img src="/images/k8s.png" alt="Kubernetes / K8s" class="w-full h-60 sm:h-72 md:h-80 object-cover sm:rounded-t-large dark:brightness-75" />
+			
+			<div class="w-full flex items-center absolute bottom-0 justify-start">
+				<h1 class="article-title-cover text-center mx-6 my-6 text-second-text-color bg-background-color-transparent px-4 py-3 text-3xl sm:text-4xl md:text-5xl font-semibold backdrop-blur-lg rounded-xl border border-border-color ">Kubernetes / K8s</h1>
 			</div>
 			
 		</div>
@@ -357,13 +363,54 @@
     
         <span class="article-date article-meta-item">
             <i class="fa-regular fa-wrench"></i>&nbsp;
-            <span class="desktop">2025-04-13 18:28:29</span>
-            <span class="mobile">2025-04-13 18:28:29</span>
+            <span class="desktop">2025-04-18 14:46:52</span>
+            <span class="mobile">2025-04-18 14:46:52</span>
             <span class="hover-info">更新</span>
         </span>
     
 
     
+        <span class="article-categories article-meta-item">
+            <i class="fa-regular fa-folders"></i>&nbsp;
+            <ul>
+                
+                
+                    
+                        
+                        <li>
+                            <a href="/categories/%E8%BF%90%E7%BB%B4/">运维</a>&nbsp;
+                        </li>
+                    
+                    
+                
+                    
+                        
+                            <li>></li>
+                        
+                        <li>
+                            <a href="/categories/%E8%BF%90%E7%BB%B4/k8s/">k8s</a>&nbsp;
+                        </li>
+                    
+                    
+                
+            </ul>
+        </span>
+    
+    
+        <span class="article-tags article-meta-item">
+            <i class="fa-regular fa-tags"></i>&nbsp;
+            <ul>
+                
+                    <li>
+                        <a href="/tags/%E8%BF%90%E7%BB%B4/">运维</a>&nbsp;
+                    </li>
+                
+                    <li>
+                        | <a href="/tags/k8s/">k8s</a>&nbsp;
+                    </li>
+                
+            </ul>
+        </span>
     
 
     
@@ -385,7 +432,191 @@
 
 
 		<div class="article-content markdown-body px-2 sm:px-6 md:px-8 pb-8">
-			
+			<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>Kubernetes（简称 K8s）是 Google 开源的容器编排平台，它的核心能力是：</p>
+<p><strong>自动管理大规模容器：运行、扩容、重启、故障转移、服务发现等</strong></p>
+<p>它的目标是：“你只管说‘我需要几个服务’，K8s 来帮你部署、分配、调度、维护”。</p>
+<h3 id="开始前"><a href="#开始前" class="headerlink" title="开始前"></a>开始前</h3><ol>
+<li>学习 Kubernetes 前你需要会的</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>必备知识</th>
+<th>状态</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Linux 基本操作</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Docker（容器镜像、run、volume）</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>CI&#x2F;CD 简单概念</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Nginx、Web 服务部署</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>YAML 配置文件</td>
+<td>✅</td>
+</tr>
+</tbody></table>
+<p>🥇 入门阶段：了解核心概念（可以 2 小时搞懂）</p>
+<table>
+<thead>
+<tr>
+<th>核心概念</th>
+<th>简单理解</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Pod</td>
+<td>容器的最小运行单位，1~n 个容器组成</td>
+</tr>
+<tr>
+<td>Node</td>
+<td>工作节点（本质就是服务器）</td>
+</tr>
+<tr>
+<td>Deployment</td>
+<td>声明你要运行哪些 Pod、多少个副本、怎么升级</td>
+</tr>
+<tr>
+<td>Service</td>
+<td>网络服务，提供访问入口（ClusterIP &#x2F; NodePort）</td>
+</tr>
+<tr>
+<td>Namespace</td>
+<td>项目隔离空间（类似 Git 分支）</td>
+</tr>
+</tbody></table>
+<p>🥈 实操阶段：本地部署 K8s，跑个服务</p>
+<table>
+<thead>
+<tr>
+<th>方法</th>
+<th>推荐工具</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>本地单节点测试</td>
+<td>minikube ✅ 推荐（轻量 + 官方）</td>
+</tr>
+<tr>
+<td>Docker Desktop 内置 K8s</td>
+<td>✅ Mac 用户也适合</td>
+</tr>
+<tr>
+<td>使用 kubectl 控制集群</td>
+<td>必备 CLI 工具</td>
+</tr>
+<tr>
+<td>跑一个 Nginx</td>
+<td>创建 Deployment + Service</td>
+</tr>
+<tr>
+<td>跑你自己的博客镜像</td>
+<td>比如用你已有的静态 HTML 做一个 nginx 容器跑起来</td>
+</tr>
+</tbody></table>
+<p>🥉 进阶阶段：部署 + 高可用 + CI&#x2F;CD 集成</p>
+<table>
+<thead>
+<tr>
+<th>技术点</th>
+<th>应用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Helm</td>
+<td>K8s 的 “包管理器”，一键部署 WordPress &#x2F; Redis &#x2F; MySQL</td>
+</tr>
+<tr>
+<td>Ingress</td>
+<td>HTTP 代理路由入口，比如实现 blog.karen.com</td>
+</tr>
+<tr>
+<td>ConfigMap + Secret</td>
+<td>配置注入（如博客 config）</td>
+</tr>
+<tr>
+<td>Kustomize</td>
+<td>多环境配置管理</td>
+</tr>
+<tr>
+<td>GitOps</td>
+<td>CI&#x2F;CD 自动部署到 K8s（ArgoCD、Flux）</td>
+</tr>
+<tr>
+<td>Prometheus + Grafana</td>
+<td>集群监控可视化</td>
+</tr>
+</tbody></table>
+<h3 id="Cluster-集群"><a href="#Cluster-集群" class="headerlink" title="Cluster 集群"></a>Cluster 集群</h3><ol>
+<li><p>一句话理解什么是“集群”（Cluster）<br>集群 &#x3D; 一组“联网协作的服务器”，它们对外表现成“一个整体”来提供服务。<br><strong>❓集群是不同地区的主机吗？</strong><br><strong>不一定。集群可以在同一机房，也可以跨地区，只要网络能通就可以形成集群。</strong><br>但大多数企业为了性能，会把集群部署在同一个局域网 &#x2F; 数据中心里（比如阿里云、K8s 云服务集群）<br><strong>❓集群是“一个服务用一群主机来跑”吗？</strong><br> ✅ 正解！<br> 你可以：<br> •	把一个服务部署到多个节点上，分摊压力（比如你的博客 + 负载均衡）<br> •	把多个服务（博客、评论、数据库）部署到同一个集群，资源复用<br> Kubernetes 会自动决定：<br> •	哪台机器资源够？就分配上去<br> •	哪个服务需要 3 个副本？我自动帮你部署到 3 台节点<br> •	哪个节点宕机？自动重启到别的节点上！</p>
+</li>
+<li><p>📦 类比解释一：集群就像一个“厨房团队”</p>
+</li>
+</ol>
+<p>•	你想点一份“大餐服务”（比如部署你博客 + 数据库 +评论系统）<br>•	一个厨师（单台服务器）可能忙不过来<br>•	所以你请了一整组厨师（多台机器）<br>•	厨房团队（集群）会自动决定：<br>•	谁煮主菜？<br>•	谁负责炒菜？<br>•	万一一个厨师倒下（宕机），谁来顶上？</p>
+<p>✅ 这整个厨房团队 &#x3D; “集群”<br>✅ 他们之间的分工、调度、故障切换 &#x3D; Kubernetes 来负责</p>
+<ol start="3">
+<li>📌 技术一点说：</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>集群 (Cluster)</td>
+<td>一组通过网络连接的“节点”服务器</td>
+</tr>
+<tr>
+<td>节点 (Node)</td>
+<td>集群中的一台机器，可以是虚拟机或物理机</td>
+</tr>
+<tr>
+<td>主节点 (Master)</td>
+<td>管理整个集群的大脑，负责调度、监控、API</td>
+</tr>
+<tr>
+<td>工作节点 (Worker)</td>
+<td>实际跑你应用的机器（比如跑 nginx &#x2F; 博客）</td>
+</tr>
+</tbody></table>
+<h4 id="k8s中的“集群结构图”"><a href="#k8s中的“集群结构图”" class="headerlink" title="k8s中的“集群结构图”"></a>k8s中的“集群结构图”</h4><div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">            [ Master 控制节点 ]</span><br><span class="line">           ┌───────────────┐</span><br><span class="line">           │  调度服务 kube-scheduler</span><br><span class="line">           │  API Server</span><br><span class="line">           │  状态控制器</span><br><span class="line">           └───────────────┘</span><br><span class="line">                     ↓</span><br><span class="line">      ┌──────────────┬──────────────┐</span><br><span class="line">      ↓              ↓              ↓</span><br><span class="line">[Worker Node1]   [Worker Node2]  [Worker Node3]</span><br><span class="line">  └─Pod: Nginx     └─Pod: Blog     └─Pod: Redis</span><br><span class="line">  └─Pod: Mongo     └─Pod: Hexo     └─Pod: 评论系统</span><br></pre></td></tr></table></figure></div>
+<p><strong>现实中的“集群”都用在哪？</strong></p>
+<table>
+<thead>
+<tr>
+<th>场景</th>
+<th>应用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>大公司网站</td>
+<td>多地部署，形成全球K8s集群(CDN+服务节点)</td>
+</tr>
+<tr>
+<td>企业SaaS平台</td>
+<td>用集群提升高可用性+自动扩容能力</td>
+</tr>
+<tr>
+<td>云服务商</td>
+<td>用户只用申请一个“集群”，背后全自动   ｜</td>
+</tr>
+</tbody></table>
+<h5 id="集群是多台主机组成的“一个大脑-多个手”的团队。K8s-负责调度大脑，让每个服务都能稳定运行，掉了就补、慢了就扩。"><a href="#集群是多台主机组成的“一个大脑-多个手”的团队。K8s-负责调度大脑，让每个服务都能稳定运行，掉了就补、慢了就扩。" class="headerlink" title="集群是多台主机组成的“一个大脑 + 多个手”的团队。K8s 负责调度大脑，让每个服务都能稳定运行，掉了就补、慢了就扩。"></a>集群是多台主机组成的“一个大脑 + 多个手”的团队。K8s 负责调度大脑，让每个服务都能稳定运行，掉了就补、慢了就扩。</h5><h2 id="安装K8s"><a href="#安装K8s" class="headerlink" title="安装K8s"></a>安装K8s</h2><div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64</span><br><span class="line"><span class="built_in">sudo</span> install minikube-linux-amd64 /usr/local/bin/minikube</span><br><span class="line"><span class="comment"># x86架构 是amd64  如果是arm架构的需要换成 arm64</span></span><br><span class="line">minikube start --driver=docker <span class="comment"># 如果到这步卡住 是因为网络问题拉不到镜像 </span></span><br><span class="line"><span class="comment"># 可以换下面的方法</span></span><br><span class="line">minikube start \</span><br><span class="line">  --image-mirror-country=cn \</span><br><span class="line">  --registry-mirror=https://registry.cn-hangzhou.aliyuncs.com \</span><br><span class="line">  --driver=docker</span><br></pre></td></tr></table></figure></div>
+<p>不知道自己是什么CPU架构？</p>
+<div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">uname</span> -m</span><br><span class="line"><span class="comment"># aarch64   aarch64就是arm架构</span></span><br></pre></td></tr></table></figure></div>
 		</div>
 
 		
@@ -399,7 +630,7 @@
         
             <li>
                 <strong>更新于
-                    :</strong> 2025-04-13 18:28:29
+                    :</strong> 2025-04-18 14:46:52
             </li>
         
         <li>
@@ -422,6 +653,18 @@
 		
 
 		
+		<ul class="post-tags-box text-lg mt-1.5 flex-wrap justify-center flex md:hidden">
+			
+			<li class="tag-item mx-0.5">
+				<a href="/tags/%E8%BF%90%E7%BB%B4/">#运维</a>&nbsp;
+			</li>
+			
+			<li class="tag-item mx-0.5">
+				<a href="/tags/k8s/">#k8s</a>&nbsp;
+			</li>
+			
+		</ul>
+		
 
 		
   <div class="recommended-article px-2 sm:px-6 md:px-8">
@@ -429,27 +672,27 @@
     <div class="recommended-article-header text-xl md:text-3xl font-bold mt-10">
      <i aria-hidden="true"></i><span>推荐阅读</span>
     </div>
-    <div class="recommended-article-group"><a class="recommended-article-item" href="/2025/03/26/Python/" title="Python" rel="bookmark">
-  <img src="/images/python.png" alt="Python" class="!max-w-none">
-  <span class="title">Python</span>
-</a><a class="recommended-article-item" href="/2025/03/26/Shell/" title="Shell" rel="bookmark">
-  <img src="https://img0.baidu.com/it/u=279259354,2980670496&fm=253&fmt=auto&app=138&f=JPEG?w=1387&h=500" alt="Shell" class="!max-w-none">
-  <span class="title">Shell</span>
-</a><a class="recommended-article-item" href="/2025/04/13/CI-CD/" title="DevOps 世界的灵魂技术：CI/CD 流水线" rel="bookmark">
+    <div class="recommended-article-group"><a class="recommended-article-item" href="/2025/04/13/CI-CD/" title="DevOps 世界的灵魂技术：CI/CD 流水线" rel="bookmark">
   <img src="/images/cicd.png" alt="DevOps 世界的灵魂技术：CI/CD 流水线" class="!max-w-none">
   <span class="title">DevOps 世界的灵魂技术：CI/CD 流水线</span>
+</a><a class="recommended-article-item" href="/2025/03/25/docker/" title="Docker" rel="bookmark">
+  <img src="/images/docker.webp" alt="Docker" class="!max-w-none">
+  <span class="title">Docker</span>
+</a><a class="recommended-article-item" href="/2025/03/30/moniter/" title="Prometheus+Grafana" rel="bookmark">
+  <img src="/images/监控.png" alt="Prometheus+Grafana" class="!max-w-none">
+  <span class="title">Prometheus+Grafana</span>
 </a></div>
    </div>
    <div class="recommended-mobile">
    <div class="recommended-article-header text-xl md:text-3xl font-bold mt-10">
      <i aria-hidden="true"></i><span>推荐阅读</span>
    </div>
-   <div class="recommended-article-group"><a class="recommended-article-item" href="/2025/03/26/Python/" title="Python" rel="bookmark">
-  <img src="/images/python.png" alt="Python" class="!max-w-none">
-  <span class="title">Python</span>
-</a><a class="recommended-article-item" href="/2025/03/26/Shell/" title="Shell" rel="bookmark">
-  <img src="https://img0.baidu.com/it/u=279259354,2980670496&fm=253&fmt=auto&app=138&f=JPEG?w=1387&h=500" alt="Shell" class="!max-w-none">
-  <span class="title">Shell</span>
+   <div class="recommended-article-group"><a class="recommended-article-item" href="/2025/04/13/CI-CD/" title="DevOps 世界的灵魂技术：CI/CD 流水线" rel="bookmark">
+  <img src="/images/cicd.png" alt="DevOps 世界的灵魂技术：CI/CD 流水线" class="!max-w-none">
+  <span class="title">DevOps 世界的灵魂技术：CI/CD 流水线</span>
+</a><a class="recommended-article-item" href="/2025/03/25/docker/" title="Docker" rel="bookmark">
+  <img src="/images/docker.webp" alt="Docker" class="!max-w-none">
+  <span class="title">Docker</span>
 </a></div>
    </div>
   </div>
@@ -526,7 +769,7 @@
 	<div class="post-toc">
 		<div class="toc-title">目录</div>
 		<div class="page-title">Kubernetes / K8s</div>
-		
+		<ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-text">简介</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BC%80%E5%A7%8B%E5%89%8D"><span class="nav-text">开始前</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Cluster-%E9%9B%86%E7%BE%A4"><span class="nav-text">Cluster 集群</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#k8s%E4%B8%AD%E7%9A%84%E2%80%9C%E9%9B%86%E7%BE%A4%E7%BB%93%E6%9E%84%E5%9B%BE%E2%80%9D"><span class="nav-text">k8s中的“集群结构图”</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%85K8s"><span class="nav-text">安装K8s</span></a></li></ol>
 
 	</div>
 </div>
