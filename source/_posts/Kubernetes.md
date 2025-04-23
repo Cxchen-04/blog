@@ -128,9 +128,126 @@ minikube start \
   --image-mirror-country=cn \
   --registry-mirror=https://registry.cn-hangzhou.aliyuncs.com \
   --driver=docker
+# 如果还不可以 那我们就用docker去拉镜像 然后在minikube的启动参数上添加 --base-image=镜像名
+# --base-image=registry.cn-hangzhou.aliyuncs.com/google_containers/kicbase:v0.0.46
 ```
 不知道自己是什么CPU架构？
 ``` bash
 uname -m
 # aarch64   aarch64就是arm架构
+```
+## K8s命令
+1. 🚀 集群与配置
+``` bash
+# 查看集群信息
+kubectl cluster-info
+
+# 查看当前上下文
+kubectl config current-context
+
+# 设置上下文（切换集群、命名空间等）
+kubectl config use-context <context-name>
+
+# 查看所有上下文
+kubectl config get-contexts
+```
+2. 📦 资源管理（Pods, Deployments, Services等）
+
+``` bash
+# 查看所有资源
+kubectl get all
+
+# 查看所有Pod
+kubectl get pods [-n <namespace>] [-o wide]
+
+# 查看Deployment
+kubectl get deployments
+
+# 查看Service
+kubectl get svc
+
+# 创建资源
+kubectl apply -f <file.yaml>
+
+# 删除资源
+kubectl delete -f <file.yaml>
+kubectl delete pod <pod-name>
+
+# 更新资源
+kubectl edit deployment <deployment-name>
+
+# 滚动更新
+kubectl rollout restart deployment <deployment-name>
+```
+3. 🔍 查看与调试
+``` bash
+# 查看 Pod 日志
+kubectl logs <pod-name>
+kubectl logs -f <pod-name>  # 实时查看
+
+# 查看某个容器的日志（多容器 Pod）
+kubectl logs <pod-name> -c <container-name>
+
+# 进入 Pod（终端）
+kubectl exec -it <pod-name> -- /bin/bash
+
+# 描述资源
+kubectl describe pod <pod-name>
+
+# 查看事件
+kubectl get events
+```
+4. 💾 存储（PVC, PV）
+``` bash
+# 查看持久卷声明
+kubectl get pvc
+
+# 查看持久卷
+kubectl get pv
+```
+5. 🎯 部署与服务（Deployment, Service, Ingress）
+``` bash
+# 创建 Deployment
+kubectl create deployment <name> --image=<image-name>
+
+# 对外暴露端口（创建 Service）
+kubectl expose deployment <deployment-name> --port=80 --target-port=8080 --type=NodePort
+
+# 查看 Ingress
+kubectl get ingress
+```
+6. 🔧 配置资源（ConfigMap, Secret）
+``` bash
+# 创建 ConfigMap
+kubectl create configmap <name> --from-literal=key=value
+
+# 查看 ConfigMap
+kubectl get configmap
+
+# 创建 Secret
+kubectl create secret generic <name> --from-literal=password=123456
+
+# 查看 Secret
+kubectl get secrets
+```
+7. 🧪 调试和测试
+``` bash
+# 运行一个临时Pod进行测试
+kubectl run -it --rm debug --image=busybox -- /bin/sh
+
+# 查看Pod状态
+kubectl get pod <pod-name> -o json
+```
+8. 📄 YAML 生成和导出
+``` bash
+# 导出资源为yaml
+kubectl get deployment <name> -o yaml > deployment.yaml
+```
+9.  🚫 删除资源
+``` bash
+# 删除所有资源
+kubectl delete all --all
+
+# 删除命名空间
+kubectl delete namespace <name>
 ```
