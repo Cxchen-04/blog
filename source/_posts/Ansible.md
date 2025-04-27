@@ -33,7 +33,7 @@ Ansible 是一个自动化运维工具，可以帮你用“一段脚本”自动
 | user                 | 将容器加入某个网络   |
 | command/shell       | 启动时指定网络        |
 
-3. Playbook（剧本）📜
+<!-- 3. Playbook（剧本）📜
 你写的一份 .yaml 文件，定义了“在哪些机器上执行哪些任务”。
 ```yaml
 - hosts: all
@@ -43,7 +43,7 @@ Ansible 是一个自动化运维工具，可以帮你用“一段脚本”自动
       apt:
         name: nginx
         state: present
-```
+``` -->
 4. Tasks(任务)🧾
 Playbook 中的每一个动作，比如“安装 nginx”、“复制文件”，都叫一个任务（task）。
 5. Variables（变量）📦

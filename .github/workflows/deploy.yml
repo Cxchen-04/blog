@@ -28,11 +28,25 @@ jobs:
         - name: 查看构建结果文件夹
           run: ls -al public/
 
-        - name: 上传到服务器
+        # - name: 上传到服务器 马上过期
+        #   uses: easingthemes/ssh-deploy@v2.1.5
+        #   with:
+        #     SSH_PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
+        #     REMOTE_USER: root
+        #     REMOTE_HOST: 47.242.175.167
+        #     TARGET: /var/www/html
+        #     SORUCE: public/
+
+        - name: 上传到服务器 新服务器
           uses: easingthemes/ssh-deploy@v2.1.5
           with:
             SSH_PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
             REMOTE_USER: root
-            REMOTE_HOST: 47.242.175.167
-            TARGET: /var/www/html
+            REMOTE_HOST: 8.218.189.240
+            TARGET: ~/blog
             SORUCE: public/
+            script: |
+              cd /blog
+              git pull origin main
+              docker compose down -v
+              docker compose up -d
