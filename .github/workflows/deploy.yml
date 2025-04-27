@@ -54,19 +54,19 @@ jobs:
         - name: 上传public
           uses: appleboy/scp-action@v0.1.7
           with:
-            REMOTE_HOST: 8.218.189.240
-            REMOTE_USER: root
+            host: 8.218.189.240
+            username: root
             key: ${{ secrets.SERVER_SSH_KEY }}
-            source: "public/**"
-            target: "~/blog"
+            source: public/**
+            target: ~/blog
             
-        - name: SSH into server and restart services
+        - name: SSH into server and restart services 重启docker
           uses: appleboy/ssh-action@v0.1.8
           with:
-            REMOTE_HOST: 8.218.189.240
-            REMOTE_USER: root
+            host: 8.218.189.240
+            username: root
             key: ${{ secrets.SERVER_SSH_KEY }}
             script: |
-              cd /root/blog
+              cd ~/blog
               docker compose down -v || true
               docker compose up -d
