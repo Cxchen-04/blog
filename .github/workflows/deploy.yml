@@ -50,6 +50,14 @@ jobs:
         #       git pull origin main
         #       docker compose down -v
         #       docker compose up -d
+        - name: 上传public到旧服务器
+          uses: appleboy/scp-action@v0.1.7
+          with:
+            host: 47.242.175.167
+            username: root
+            key: ${{ secrets.SERVER_SSH_KEY }}
+            source: public/**
+            target: /var/www/html
 
         - name: 上传public
           uses: appleboy/scp-action@v0.1.7
