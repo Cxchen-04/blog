@@ -54,8 +54,8 @@ jobs:
         - name: 上传public
           uses: appleboy/scp-action@v0.1.7
           with:
-            host: ${{ secrets.8.218.189.240 }}
-            username: root
+            REMOTE_HOST: 8.218.189.240
+            REMOTE_USER: root
             key: ${{ secrets.SERVER_SSH_KEY }}
             source: "public/**"
             target: "~/blog"
@@ -63,8 +63,8 @@ jobs:
         - name: SSH into server and restart services
           uses: appleboy/ssh-action@v0.1.8
           with:
-            host: ${{ secrets.SERVER_IP }}
-            username: root
+            REMOTE_HOST: 8.218.189.240
+            REMOTE_USER: root
             key: ${{ secrets.SERVER_SSH_KEY }}
             script: |
               cd /root/blog
