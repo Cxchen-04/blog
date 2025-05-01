@@ -98,7 +98,8 @@ scrape_configs:
       module: [http_2xx]
     static_configs:
       - targets:
-          - http://你的域名或者IP
+          - http://你的域名或者IP  # 这里就是grafana的监控项
+          - prometheus:9090
     relabel_configs:
       - source_labels: [__address__]
         target_label: __param_target
@@ -297,3 +298,82 @@ sudo systemctl restart grafana-server
 ✅ 如果设置成功，你应该会在邮箱里看到一个测试邮件！
 
 🎉 完成！
+
+## Docker 部署
+我们如果要用docker部署的话 需要额外下载一个组件 __"nginx-prometheus-exporter"__ 因为docker的容器有隔离机制 因此我们需要这个nginx容器暴露出来的 __stub_status__  页面
+
+| 组件名             | 作用说明                               | 镜像名称（Docker Hub）                  | 备注                           |
+|:-------------------|:---------------------------------------|:----------------------------------------|:-------------------------------|
+| Prometheus         | 监控数据采集和存储                     | prom/prometheus                         | 采集 nginx-exporter、node-exporter、blackbox-exporter |
+| Grafana            | 数据展示和可视化面板                   | grafana/grafana                         | 连接 Prometheus 做图表 |
+| nginx-prometheus-exporter | 抓取 Nginx 的内部状态指标             | nginx/nginx-prometheus-exporter         | 需要 Nginx 开启 stub_status |
+| node-exporter      | 抓取服务器本身 CPU、内存、磁盘、网络指标 | prom/node-exporter                      | 服务器基础性能监控 |
+| blackbox-exporter  | 外部探测 HTTP/HTTPS 可用性、状态等      | prom/blackbox-exporter                  | 检测网站存活、SSL证书有效期等 |
+| Nginx（你的Web服务器） | 提供网站服务+反向代理                  | nginx:latest                            | 被监控的对象 |
+
+### Docker Compose的配置方法
+1. Prometheus
+docker-compose的配置方法
+```yaml
+services:
+    prometheus:
+      image: prom/prometheus
+      container_name: prometheus
+      ports:
+        - "9090:9090"
+      volumes:
+        - "./prometheus.yml:/etc/prometheus/prometheus.yml"
+      restart: always
+```
+2. Grafana
+docker-compose的配置方法
+```yaml
+services:
+    grafana:
+      image: grafana/grafana
+      container_name: grafana
+      ports:
+        - "3000:3000"
+      restart: always
+      environment:
+        - GF_SERVER_ROOT_URL=https://yourServername/grafana/
+```
+3. nginx-prometheus-exporter 暴露容器内部
+docker-compose的配置方法。
+```yaml
+nginx-exporter:
+      image: nginx/nginx-prometheus-exporter
+      container_name: nginx-exporter
+      ports:
+        - "9113:9113"
+      command:
+#        - nginx.scrape-uri=http://nginx/stub_status
+        - "--nginx.scrape-uri=https://yourServername/stub_status" # 如果你的网站没有ssl证书 改成http即可
+#        - "--nginx.ssl-verify=false"
+      depends_on:
+        - nginx
+      restart: always
+```
+
+4. node-exporter 监控服务器性能
+docker-compose的配置方法。
+```yaml
+services:
+   nodexport:
+      image: prom/node-exporter
+      container_name: exporter
+      ports:
+        - "9100:9100"
+      restart: always
+```
+5. blackbox-exporter 监控网站状态
+docker-compose的配置方法
+```yaml
+services:
+    blackbox-exporter:
+      image: prom/blackbox-exporter:latest
+      container_name: blackbox-exporter
+      ports:
+        - "9115:9115"
+      restart: always
+```

@@ -64,3 +64,182 @@ vars:
 | 复用性     | 差                        | 好，支持变量和模块                             |
 | 错误处理   | 要手写判断                 | 自动判断执行结果                               |
 | 多机部署   | 要循环 + 远程命令          | 天生多机执行（Inventory 配置即可）             |
+
+## 使用Ansible
+1. 🧾 第一步：准备你的 Ansible 主机清单（Inventory）
+创建一个hosts.ini的文件：
+```ini
+[all]
+192.168.1.101
+192.168.1.102
+192.168.1.103
+192.168.1.104
+```
+📌 说明：这里定义了一个叫 webservers 的组，包含3台要删除 Nginx 的服务器 IP。你可以换成你自己的服务器地址。
+2. 🛠️ 第二步：写一个下载 Nginx 的 Playbook
+创建一个名为 install_nginx.yml 的 YAML 文件：
+```yaml
+- name: install nginx  # 此任务名称
+  hosts: all        # 这里的all指向的是hosts文件中的[all]
+  become: yes       # 使用 sudo 权限执行
+  tasks:      # 下面要执行的具体任务列表
+    - name: install nginx    # 第一个任务 安装 nginx
+      apt:      # 使用 apt 模块
+        name: nginx     # 要安装的软件包名: nginx
+        state: present    # 保证软件包“已安装”状态（不存在就会被安装）
+        update_cache: yes     # 更新 apt 源缓存
+    - name: start nginx      # 第二个任务 启动 nginx
+      service:   # 使用 service模块操作系统服务
+        name: nginx     # 操作的服务名称: nginx
+        state: started    # 保证服务处于 “启动”状态
+        enabled: yes      #设置为开机自启
+```
+3. ▶️ 第三步：运行这个 Playbook 命令
+```bash
+ansible-playbook -i ../hosts install_nginx.yml 
+```
+## 实战
+### 批量安装 Kubernetes
+1. 第一步 先创建inventory
+```bash
+mkdir -p ~/k8s
+cd k8s
+nano hosts.ini
+```
+编写hosts文件
+```ini
+[all]
+172.17.50.246 ansible_user=h3d ansible_become=true ansible_become_method=sudo
+172.17.50.247 ansible_user=h3d ansible_become=true ansible_become_method=sudo
+172.17.50.248 ansible_user=h3d ansible_become=true ansible_become_method=sudo
+172.17.50.249 ansible_user=h3d ansible_become=true ansible_become_method=sudo
+[master]
+172.17.50.246
+[worker]
+172.17.50.247
+172.17.50.248
+172.17.50.249
+```
+#### 设置基础环境
+用ansible来批量设置master和worker的环境
+1. 创建playbook
+```bash
+nano setup.yml
+```
+```yml
+- name: base environment (shuting swap)
+  hosts: all
+  become: yes
+  tasks:
+    - name: shuting swap
+      shell: swapoff -a
+      ignore_errors: true
+    - name: permenant shuting swap
+      replace:
+        path: /etc/fstab
+        regexp: '^\s*(.+?\s+)+swap\s+'
+        replace: '# \1'
+      ignore_errors: true
+
+    - name: enable kernel module
+      shell: |
+        modprobe overlay
+        modprobe br_netfilter
+      ignore_errors: true
+
+    - name: deploy kernel arguments
+      copy:
+        dest: /etc/sysctl.d/k8s.conf
+        content: |
+          net.bridge.bridge-nf-call-ip6tables = 1
+          net.bridge.bridge-nf-call-iptables = 1
+
+    - name: apply sysctl configration
+      shell: sysctl --system
+```
+#### 容器选择
+因为k8s在1.24版本移除了docker的支持，因此我们推荐使用containerd来座位k8s的容器，具体为什么我们移步 __K8s__ 章节观看
+1. 创建playbook
+```bash
+nano install-containerd.yml
+```
+
+```yml
+- name: install containerd
+  hosts: all
+  become: yes
+  tasks:
+    - name: install containerd
+      apt:
+        name: containerd
+        state: present
+        update_cache: yes
+    - name: make containerd configuration file
+      file:
+        path: /etc/containerd
+        state: directory
+    - name: create default configuration file
+      shell: containerd config default > /etc/containerd/config.toml
+      args:
+        creates: /etc/contaierd/config.toml
+    - name: enable SystemdCgroup (compatable kubernetes)
+      replace:
+        path: /etc/containerd/config.toml
+        regexp: 'SystemdCgroup = false'
+        replace: 'SystemdCgroup = true'
+    - name: restart && enable containerd service
+      systemd:
+        name: containerd
+        enabled: yes
+        state: restarted
+```
+我们在主节点生成配置文件
+```bash
+containerd config default > /etc/containerd/config.toml
+```
+找到这个位置，确认存在并设置为阿里云镜像：
+```bash
+[plugins."io.containerd.grpc.v1.cri"]
+  sandbox_image = "registry.aliyuncs.com/google_containers/pause:3.8"
+```
+向下继续找到 runc 配置段，设置如下（一定要加上 SystemdCgroup = true）：
+```bash
+[plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options]
+  SystemdCgroup = true
+```
+#### 安装k8s
+1. 创建playbook
+```bash
+nano install-k8s.yml
+```
+写入以下配置
+```yml
+- name: install kubernetes module
+  hosts: all
+  become: yes
+  tasks:
+    - name: add Kubernetes source
+      copy:
+        dest: /etc/apt/sources.list.d/kubernetes.list
+        content: |
+          deb [trusted=yes] https://mirrors.aliyun.com/kubernetes/apt/ kubernetes-xenial main
+    - name: update apt source
+      apt:
+        update_cache: yes
+
+    - name: install kueblet kubeadm kubectl
+      apt:
+        name:
+          - kubelet
+          - kubeadm
+          - kubectl
+        state: present
+        update_cache: yes
+
+    - name: lock version
+      shell: apt-mark hold kubelet kubeadm kubectl
+```
+2. 运行
+```bash
+ansible-playbook -i ../hosts install-k8s.yml --ask-pass --ask-become-pass
+```

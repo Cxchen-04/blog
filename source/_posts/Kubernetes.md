@@ -117,7 +117,84 @@ __现实中的“集群”都用在哪？__
 
 ##### 集群是多台主机组成的“一个大脑 + 多个手”的团队。K8s 负责调度大脑，让每个服务都能稳定运行，掉了就补、慢了就扩。
 
-## 安装K8s
+
+## 安装K8s 生产环境
+在安装 Kubernetes（特别是用 kubeadm 搭建生产级多节点集群）之前，确实需要做一系列“打地基”的设置，不然后续很容易出现各种诡异问题（如 kubelet 启动失败、网络不通、无法加入集群等）。
+### 前提
+##### 一、系统基础配置（所有节点都需要）
+| 设置项       | 建议值/动作                          | 说明                                   |
+|--------------|---------------------------------------|----------------------------------------|
+| 操作系统     | Ubuntu 20.04+ / CentOS 7+             | 兼容最好，建议使用 LTS 版本            |
+| 用户权限     | 使用 root 用户 或 sudo 权限用户       | 所有设置都需要管理员权限              |
+| 主机名唯一   | `hostnamectl set-hostname node1`      | 否则可能无法区分节点                   |
+| hosts 配置   | 每个节点要能解析其他节点名            | 修改 `/etc/hosts` 加入节点映射         |
+| 时间同步     | 安装 `chrony` 或 `ntp` 保证时间一致   | 时间不一致会导致证书验证失败          |
+
+##### 二、关闭或配置系统功能（重要！）
+| 项目                       | 命令                                                  | 原因                                                  |
+|----------------------------|-------------------------------------------------------|-------------------------------------------------------|
+| 关闭 swap                  | `swapoff -a` 并注释 `/etc/fstab` 中 swap 行         | Kubernetes 禁止使用 swap                              |
+| 关闭防火墙（开发环境）     | `systemctl stop firewalld/ufw`                        | 节点间通讯可能被拦截，生产环境要配置策略              |
+| 关闭 SELinux（CentOS）     | `setenforce 0` 并编辑 `/etc/selinux/config`          | 否则 kubelet 启动失败                                 |
+| 配置 iptables              | `modprobe br_netfilter` + 设置 sysctl 参数           | 否则网络插件会出问题                                  |
+
+```bash
+cat <<EOF | sudo tee /etc/modules-load.d/k8s.conf
+br_netfilter
+EOF
+
+cat <<EOF | sudo tee /etc/sysctl.d/k8s.conf
+net.bridge.bridge-nf-call-iptables  = 1
+net.ipv4.ip_forward                 = 1
+net.bridge.bridge-nf-call-ip6tables = 1
+EOF
+
+sysctl --system
+```
+##### 三、容器运行时选择
+因为k8s在1.24版本弃用了docker的支持 所以更支持用containerd来跑容器
+| 选项         | 说明                                                 |
+|--------------|------------------------------------------------------|
+| containerd ✅ | 官方推荐，轻量稳定                                   |
+| Docker ❌     | 已不推荐，需额外安装 cri-dockerd                    |
+
+推荐安装 containerd：
+```bash
+sudo apt install -y containerd
+sudo mkdir -p /etc/containerd
+containerd config default | sudo tee /etc/containerd/config.toml
+sudo systemctl restart containerd
+```
+##### 四、安装 kubeadm / kubelet / kubectl（核心三件套）
+添加 K8s 官方源 + 安装：
+``` bash
+sudo apt update && sudo apt install -y apt-transport-https curl
+
+curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+
+cat <<EOF | sudo tee /etc/apt/sources.list.d/kubernetes.list
+deb https://apt.kubernetes.io/ kubernetes-xenial main
+EOF
+
+sudo apt update
+sudo apt install -y kubelet kubeadm kubectl
+sudo apt-mark hold kubelet kubeadm kubectl
+```
+
+### 安装 k8s
+这次我们采用的单节点
+
+
+
+
+
+
+
+
+
+
+
+## 安装K8s nimikube 学习测试版本
 ``` bash
 curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
 sudo install minikube-linux-amd64 /usr/local/bin/minikube
@@ -208,3 +285,4 @@ uname -m
 |------------------|------|
 | 临时启动容器     | `kubectl run -it --rm debug --image=busybox -- /bin/sh` |
 | 导出资源为 YAML | `kubectl get deployment <name> -o yaml > deployment.yaml` |
+
