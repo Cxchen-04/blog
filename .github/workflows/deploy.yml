@@ -76,5 +76,4 @@ jobs:
             key: ${{ secrets.SERVER_SSH_KEY }}
             script: |
               cd ~/blog
-              docker compose down -v || true
-              docker compose up -d
+              docker restart blog-nginx-1 
