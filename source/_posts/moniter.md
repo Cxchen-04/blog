@@ -31,7 +31,7 @@ Grafana 是一个数据可视化工具，用来“把数据变成图表”。
 👀 简单说，它是“读数 + 画图 + 展示”的一套系统，不负责采集和存储。
 
 ## 安装
-#### 步骤一 安装Node Exporter（监控服务器性能）
+#### 安装Node Exporter（监控服务器性能）
 Node Exporter是Prometheus的官方工具，可以帮助采集服务器的硬件指标（CPU、内存、磁盘等）。
 
 ``` bash Ubuntu
@@ -72,7 +72,7 @@ sudo systemctl enable node_exporter
 http://你的服务器IP:9100/metrics
 如果能看到一堆指标文字，说明成功！
 
-#### 步骤二 安装Prometheus
+#### 安装Prometheus
 下载Prometheus：
 ``` bash Ubuntu
 wget https://github.com/prometheus/prometheus/releases/download/v2.50.0/prometheus-2.50.0.linux-amd64.tar.gz
@@ -109,7 +109,7 @@ scrape_configs:
         replacement: localhost:9115  # blackbox_exporter 监听端口
 ```
 
-#### 步骤三 安装Blackbox Exporter(探测网站状态)
+#### 安装Blackbox Exporter(探测网站状态)
 ``` bash Ubuntu
 wget https://github.com/prometheus/blackbox_exporter/releases/download/v0.25.0/blackbox_exporter-0.25.0.linux-amd64.tar.gz
 tar xvf blackbox_exporter-0.25.0.linux-amd64.tar.gz
@@ -118,14 +118,14 @@ cd blackbox_exporter-0.25.0.linux-amd64
 # 也可以添加systemd启动服务，和node_exporter类似。
 ```
 
-#### 步骤四 启动prometheus
+#### 启动prometheus
 ``` bash Ubuntu
 ./prometheus --config.file=prometheus.yml
 ```
 访问浏览器：
 http://你的服务器IP:9090，你应该可以看到 Prometheus 的 Web 页面。
 
-#### 📊 步骤五：安装 Grafana
+#### 📊安装 Grafana
 ``` bash
 sudo apt-get install -y apt-transport-https software-properties-common
 # 安装依赖
@@ -146,7 +146,7 @@ sudo systemctl enable grafana-server
 用户名：admin
 密码：admin  登录之后会要求修改密码
 
-#### 📈 步骤六：配置 Grafana
+#### 📈配置 Grafana
 添加数据源：选择 Prometheus，填入 http://localhost:9090
 导入 Dashboard 模板：
 Node Exporter：导入模板 ID 1860
@@ -168,7 +168,7 @@ systemctl restart grafana-server
 ```
 
 ### 监控告警
-#### 🛠️ 步骤一：设置 Prometheus 告警规则
+#### 🛠️ 设置 Prometheus 告警规则
 Prometheus 支持基于查询的告警规则，你可以通过 PromQL 设置条件，比如当系统负载过高时发出告警。
 1. 创建告警规则文件
 在 Prometheus 配置目录下创建一个 alert.rules 文件（如果没有的话）：
@@ -213,7 +213,7 @@ rule_files:
 ``` bash
 sudo systemctl restart prometheus
 ```
-#### 🛠️ 步骤二：配置 Grafana 告警通知
+#### 🛠️配置 Grafana 告警通知
 
 一旦 Prometheus 设置了告警规则，你就可以在 Grafana 中查看告警并设置通知。
 
@@ -244,7 +244,7 @@ sudo systemctl restart prometheus
 3. 保存告警设置
 
 设置完成后，点击 “Save” 来保存告警规则。Grafana 会根据你设置的条件，定期检查，并在触发告警时通过邮件或钉钉等渠道发送通知。
-#### 🧑‍💻 步骤三：验证告警是否有效
+#### 🧑‍💻验证告警是否有效
 1. 要让 Grafana 能通过 SMTP 发送邮件告警通知，你需要配置它的 smtp 邮件发送服务。以Gmail为例
   
 | 配置项         | 示例（以 Gmail 为例）              |

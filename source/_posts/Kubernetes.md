@@ -186,10 +186,55 @@ sudo apt-mark hold kubelet kubeadm kubectl
 
 
 
+### crictl 和 nerdctl
+你在 crictl 中能看到 nginx:latest 等镜像
+但在 nerdctl images 里是空的
+说明你的镜像目前**只存在于 containerd 的默认 namespace（k8s.io）**中，而 nerdctl 默认使用的是 moby namespace。
+✅ 解决方案：切换 nerdctl 的 namespace
+使用以下命令查看 containerd 中有哪些命名空间：
+```bash
+ctr namespaces list
+```
+你大概率会看到像这样的一些 namespace：
+```bash
+NAME     LABELS
+default
+k8s.io
+moby
+```
+➤ 查看 k8s.io 中的镜像：
+```bash
+nerdctl --namespace k8s.io images
+```
+✅ 如果你想导出这些镜像
+例如导出 nginx：
+```bash
+nerdctl --namespace k8s.io save nginx:latest -o /tmp/nginx.tar
+```
+然后在 moby 或其他你打算用来构建的 namespace 中导入：
+```bash
+nerdctl --namespace moby load -i /tmp/nginx.tar
+```
+📌 你可以设置默认 namespace（可选）
+如果你想让 nerdctl 默认也用 k8s.io 的镜像，可以设置：
+```bash
+export CONTAINERD_NAMESPACE=k8s.io
+```
+加进 .bashrc 或 .zshrc 里就能永久生效。
+操作目的
+命令示例
+查看镜像在哪些 namespace 下
+ctr namespaces list
+nerdctl 查看 k8s 镜像
+nerdctl --namespace k8s.io images
+导出 nginx 镜像
+nerdctl --namespace k8s.io save nginx -o nginx.tar
+导入镜像到默认环境
+nerdctl load -i nginx.tar
 
+nerdctl --namespace k8s.io images --digests
 
-
-
+nerdctl --namespace k8s.io image prune
 
 
 

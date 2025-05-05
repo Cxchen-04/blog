@@ -95,13 +95,124 @@ deploy:
 1. 目标是什么？
 实现一件事：我改完博客内容，push 到 GitHub，服务器自动更新上线，不用我点压缩、FTP！
 2. 目前的工具组合
+
 | 工具                        | 用法                           | 说明                       |
 |-----------------------------|--------------------------------|----------------------------|
 | GitHub + GitHub Actions     | 托管代码 + 执行 CI/CD 流水线   | 免费、好用                 |
 | SSH + rsync                 | 自动远程上传代码               | 替代 FTP，更快更稳         |
 | Nginx                       | 你已经部署好了，用作 Web 服务  | 根目录挂载网站内容         |
 
-### 目录结构
+### 使用 Jenkins
+#### 下载 jenkis
+💡 Jenkins 安装位置建议
+| 安装位置              | 适合人群                   | 优点             |     缺点         |
+|-------------------|--------------------------|----------------------------|------------|
+| ✅ 本地开发机   | 开发者、测试者、博客站点维护者    | 安装简单，易调试，不涉及公网安全问题     |  电脑关机就不能自动部署了，不能远程持续运行  |
+| ✅ 云服务器         | 想让 Jenkins 24小时在线自动部署 | 持久在线，适合多人协作    | 安装和配置略复杂，要注意安全（如开放 8080 端口、权限管理） |
+#### Mac本地安装Jenkins（最简单方式）
+1. 使用 Homebrew 安装 Jenkins
+```bash
+brew install jenkins-lts # 下载jenkins
+
+brew services start jenkins-lts # 启动jenkins
+```
+默认 Jenkins 会跑在 http://localhost:8080 上，你可以直接用浏览器打开它。
+2. 输入管理员密码（第一次登录）
+页面标题是：Unlock Jenkins（解锁 Jenkins）
+第一次打开 Jenkins 会让你输入密码，你可以运行
+```bash
+cat /Users/你的用户名/.jenkins/secrets/initialAdminPassword
+# jenkins界面会有提示
+```
+复制输出的那串密码，粘贴回 Jenkins 页面里，点【继续】。
+3. 安装插件
+系统会问你：
+	•	【安装推荐的插件】（Install suggested plugins）✅ 推荐选择这个
+	•	【选择插件要安装】（Select plugins to install）
+🔘 请点击第一个【安装推荐插件】，它会自动安装常用插件（比如 Git、SSH、Pipeline 等）。
+💡 提示：这个过程需要几分钟时间。耐心等待插件安装完毕。
+4. 创建第一个管理员用户
+安装插件后，它会进入这个页面，让你创建一个账户：
+	•	用户名（Username）: 你自己定义一个
+	•	密码（Password）: 自己设
+	•	完整名称（Full name）: 随意填写
+	•	邮箱地址（Email address）: 推荐填真实邮箱
+填好后点击【保存并继续（Save and Continue）】。
+5. 配置 Jenkins URL
+系统会提示你默认访问地址，例如：http://localhost:8080
+保持默认，点击【保存并完成（Save and Finish）】。
+
+#### 创建Pipeline项目
+1. 我们来到jenkins的web主界面，点击左上角的 **Jenkins**，即可到达首页
+2. 创建新任务
+  1. 点击【新建任务】（New Item）
+	2. 输入任务名称，例如：deploy-hexo-blog
+	3. 选择类型：【流水线（Pipeline）】✅
+	4. 点击【确定】
+#### 配置Pipeline
+1. 在 **Pipeline** 页面中配置
+到最下面的 “流水线（Pipeline）” 区块，（推荐在vscode中编写好Jenkinsfile之后复制到这里）
+	1.	定义方式：选择【Pipeline script】
+	2.	在“Script”框中粘贴以下内容（我们先用最基础的版本）
+```groovy
+pipeline {
+    agent any
+    environment {
+        DEPLOY_SERVER = '你的服务器ip'
+        DEPLOY_USER = 'root'    // 你服务器的用户
+        DEPLOY_PATH =  '/var/www/html'   // 你要上传到的目录
+        SSH_CREDENTIALS_ID = 'ecs-ssh'   // 凭证
+        LOCAL_HEXO_DIR = '/Users/macos/Desktop/blog'  // 本地的目录(绝对路径)
+    }
+    stages {
+        stage('压缩public文件夹'){
+            steps {
+                sh """
+                    cd ${env.LOCAL_HEXO_DIR}
+                    zip -r ../public.zip ./public
+                """
+            }
+        }
+        stage('删除之前的public文件夹'){
+            steps {
+                script {
+                    sshagent (credentials: ["${env.SSH_CREDENTIALS_ID}"]) {
+                        sh """
+                            ssh ${DEPLOY_USER}@${DEPLOY_SERVER} 'cd ${DEPLOY_PATH} && rm -rf public'
+                        """
+                    }
+                }
+            }
+        }
+        stage('上传并部署'){
+            steps {
+                script {
+                    sshagent (credentials: ["${env.SSH_CREDENTIALS_ID}"]) {
+                        sh """
+                            scp ${env.LOCAL_HEXO_DIR}/../public.zip ${DEPLOY_USER}@${DEPLOY_SERVER}:${DEPLOY_PATH}/
+                            ssh ${DEPLOY_USER}@${DEPLOY_SERVER} 'cd ${DEPLOY_PATH} && unzip -o public.zip && rm -f public.zip'
+                            ssh ${DEPLOY_USER}@${DEPLOY_SERVER} 'cd ${DEPLOY_PATH} && chmod -R 755 public'
+                        """
+                    }
+                }
+            }
+        }
+    }
+}
+```
+2. 点击页面底部的【保存】按钮
+#### 运行部署任务！
+1.	回到项目页面，点击左侧【立即构建（Build Now）】
+2.	Jenkins 会开始执行：
+•	压缩你本地的public文件夹
+•	通过 SSH 登录到 ECS 删除之前的public文件夹
+•	上传文件到你的部署目录
+3.	点击左侧【构建历史】中的蓝色小球 → 查看【控制台输出（Console Output）】
+✅ 如果看到 Finished: SUCCESS 就说明部署成功啦！
+
+
+### 使用 Github Actions
+#### 目录结构
 如果没有workflows 需要手动创建！
 ``` bash
 我的博客/
@@ -112,7 +223,7 @@ deploy:
 ├── public/                 👈 构建后输出目录
 ├── package.json / config.yml
 ```
-### GitHub Actions自动部署脚本
+####  GitHub Actions自动部署脚本
 ``` Yaml
 name: 自动部署博客到服务器
 
@@ -151,7 +262,7 @@ jobs:
                 SOURCE: public/         # 你网页的资源
                 
 ```
-### 配置服务器 SSH 密钥
+####  配置服务器 SSH 密钥
 1. 在本地执行命令生成密钥：
 ``` bash
 ssh-keygen -t rsa -b 4096 -C "you@example.com"
@@ -168,16 +279,14 @@ ssh-copy-id your_user@your.server.ip
 GitHub → Settings → Secrets → Actions → New repository secret
 名字叫：SERVER_SSH_KEY
 值是你私钥的内容（注意安全，不要泄露）
-
-### 修改 REMOTE_USER、REMOTE_HOST、TARGET
+#### 修改 REMOTE_USER、REMOTE_HOST、TARGET
 比如你服务器用户名是 root，公网 IP 是 1.2.3.4，部署路径是 /var/www/html，那你就填
 ``` Yaml
 REMOTE_USER: root
 REMOTE_HOST: 1.2.3.4
 TARGET: /var/www/html
 ```
-
-### 最后 推送试试！
+#### 最后 推送试试！
 ``` bash
 git add .
 git commit -m "首次添加自动部署"
