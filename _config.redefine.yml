@@ -79,10 +79,10 @@ global:
   # Effects on mouse hover
   hover:
     shadow: true # shadow effect
-    scale: false # scale effect
+    scale: true # scale effect
   # Scroll progress
   scroll_progress:
-    bar: false # progress bar
+    bar: true # progress bar
     percentage: true # percentage
   # Website counter
   website_counter:
@@ -140,10 +140,10 @@ home_banner:
     light: /images/wallhaven-wqery6-light.webp # light mode
     dark: /images/wallhaven-wqery6-dark.webp # dark mode
   # Home banner title
-  title: 月的心坚如磐石🌙
+  title: 月的心会痛🌙
   # Home banner subtitle
   subtitle:
-    text: ["元气满满，嘤嘤嘤大坏蛋","🌙代表我的♥"] # subtitle text, array
+    text: ["元气满满，嘤嘤嘤大坏蛋","🌙代表我的♥","月亮时圆时缺"] # subtitle text, array
     hitokoto:  # 一言配置
       enable: false # Whether to enable hitokoto
       show_author: false # Whether to show author

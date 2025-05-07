@@ -141,19 +141,17 @@ cat /Users/你的用户名/.jenkins/secrets/initialAdminPassword
 5. 配置 Jenkins URL
 系统会提示你默认访问地址，例如：http://localhost:8080
 保持默认，点击【保存并完成（Save and Finish）】。
-
 #### 创建Pipeline项目
 1. 我们来到jenkins的web主界面，点击左上角的 **Jenkins**，即可到达首页
-2. 创建新任务
   1. 点击【新建任务】（New Item）
-	2. 输入任务名称，例如：deploy-hexo-blog
-	3. 选择类型：【流水线（Pipeline）】✅
-	4. 点击【确定】
-#### 配置Pipeline
-1. 在 **Pipeline** 页面中配置
+  2. 输入任务名称，例如：deploy-hexo-blog
+  3. 选择类型：【流水线（Pipeline）】✅
+  4. 点击【确定】
+2. 在 **Pipeline** 页面中配置
 到最下面的 “流水线（Pipeline）” 区块，（推荐在vscode中编写好Jenkinsfile之后复制到这里）
 	1.	定义方式：选择【Pipeline script】
 	2.	在“Script”框中粘贴以下内容（我们先用最基础的版本）
+
 ```groovy
 pipeline {
     agent any
@@ -200,7 +198,7 @@ pipeline {
     }
 }
 ```
-2. 点击页面底部的【保存】按钮
+3. 点击页面底部的【保存】按钮
 #### 运行部署任务！
 1.	回到项目页面，点击左侧【立即构建（Build Now）】
 2.	Jenkins 会开始执行：
@@ -209,6 +207,21 @@ pipeline {
 •	上传文件到你的部署目录
 3.	点击左侧【构建历史】中的蓝色小球 → 查看【控制台输出（Console Output）】
 ✅ 如果看到 Finished: SUCCESS 就说明部署成功啦！
+#### 设置凭证
+刚才我们设置了 **SSH_CREDENTIALS_ID** 由于我们是刚刚创建好的jenkins还没有配置凭证
+```ini
+[ssh-agent] Could not find specified credentials: ecs-ssh
+```
+🔍 Jenkins 报错：找不到名为 ecs-ssh 的凭据
+##### 添加 SSH 凭据并命名为 ecs-ssh
+🔧 步骤如下：
+	1.	打开 Jenkins 主界面
+	2.	点击左侧【凭据（Credentials）】
+	•	如果你找不到这个入口，也可以通过：
+	•	【Manage Jenkins】→【Security】或【Manage Credentials】
+	3.	选择：(global) 全局作用域
+	4.	点击左边【Add Credentials】（添加凭据）
+📝 添加 SSH 凭据填写内容如下：
 
 
 ### 使用 Github Actions
