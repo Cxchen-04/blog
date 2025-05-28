@@ -117,6 +117,42 @@ __现实中的“集群”都用在哪？__
 
 ##### 集群是多台主机组成的“一个大脑 + 多个手”的团队。K8s 负责调度大脑，让每个服务都能稳定运行，掉了就补、慢了就扩。
 
+### k8s解决了什么问题？
+你用 Docker 启动了一个 Web 服务：
+```bash
+docker run -d -p 80:80 my-app
+```
+很好用没错。但是后来你发现问题越来越多；
+	1.	要部署 10 个容器怎么办？怎么管理？
+	2.	容器挂了怎么办？手动重启太麻烦。
+	3.	多个服务器如何分配资源？怎么调度？
+	4.	配置、密钥、服务发现怎么统一管理？
+	5.	如何升级不影响用户？如何快速回滚？
+🎯 这些痛点就是 Kubernetes 诞生的原因：它是为了解决**大规模容器管理、自动化调度和高可用性问题**而生的。
+### 必须知道的核心概念
+
+| 概念                    | 小白理解方式                                                                 |
+|-------------------------|------------------------------------------------------------------------------|
+| Pod                     | 是 K8s 中的最小 “部署单位”，通常一个 Pod 包含一个容器，就像一个房间住一个人    |
+| Node                    | 运行 Pod 的主机，可以是真实机器或虚拟机                                     |
+| Cluster                 | 多个 Node 组成一个 K8s 集群                                                  |
+| Deployment              | 定义一组 Pod 怎么创建、升级、回滚，保持数量稳定                             |
+| Service                 | 为一组 Pod 提供统一访问入口，类似 “前台服务台”                              |
+| Namespace               | 相当于集群里的分区，用于资源隔离（比如测试环境和生产环境）                   |
+| Ingress                 | 让外部可以通过域名访问集群内服务                                            |
+| Volume / PVC            | 给容器挂载数据盘，让数据不会因容器消失而丢失                                 |
+| ConfigMap / Secret      | 存配置文件和密码的地方，避免硬编码进镜像                                     |
+| RBAC 权限控制           | 限制谁能做什么操作，防止权限过大出问题                                       |
+| Kubelet / Controller / Scheduler | 是 K8s 的“大脑和神经系统”，自动完成任务调度和容器生命周期管理     |
+
+### 必须知道的容器概念
+| 概念               | 简要说明                                                                 |
+|--------------------|--------------------------------------------------------------------------|
+| 镜像 (Image)       | 是程序 + 环境的打包文件，相当于 App 安装包                              |
+| 容器 (Container)   | 是运行中的镜像，是进程不是虚拟机                                        |
+| Docker             | 是最常用的容器引擎，K8s 用它（或 containerd）运行容器                   |
+| 容器编排           | 多个容器如何自动部署、扩容、重启，就是 K8s 做的事                        |
+| YAML 配置          | K8s 所有资源都靠 YAML 定义，需要能看懂基本结构                           |
 
 ## 安装K8s 生产环境
 在安装 Kubernetes（特别是用 kubeadm 搭建生产级多节点集群）之前，确实需要做一系列“打地基”的设置，不然后续很容易出现各种诡异问题（如 kubelet 启动失败、网络不通、无法加入集群等）。
@@ -237,6 +273,229 @@ nerdctl --namespace k8s.io images --digests
 nerdctl --namespace k8s.io image prune
 
 
+## 安装K8S 内网生产环境
+### 准备工作
+机器数量3个，采用1master+2node的架构部署集群
+| IP              | 主机名       | 角色     | 数量 | 配置      |
+|-----------------|--------------|----------|------|-----------|
+| 192.168.6.235   | k8s-master    | master   | 1    | 16C 32G   |
+| 192.168.7.75    | k8s-node1     | node     | 1    | 16C 32G   |
+| 192.168.7.76    | k8s-node2     | node     | 1    | 16C 32G   |
+
+### 部署 K8S
+1. 更改主机名 配置yum源
+按照上述，更改主机名
+```bash
+hostnamectl set-h^Ctname k8s-master
+hostnamectl set-h^Ctname k8s-node1
+hostnamectl set-h^Ctname k8s-node2
+# 注意按照相应的版本调整阿里云的源地址
+wget -O /etc/yum.repos.d/CentOS-Base.repo https://mirrors.aliyun.com/repo/Centos-vault-8.5.2111.repo
+
+```
+2. 配置hosts文件
+```ini
+192.168.6.235 k8s-master
+192.168.7.75 k8s-node1
+192.168.7.76 k8s-node2
+```
+3. 关闭防火墙
+```bash
+# 临时关闭
+sudo setenforce 0
+# 永久禁用
+sudo sed -i 's/^SELINUX=.*/SELINUX=disabled/' /etc/selinux/config
+sudo systemctl stop firewalld
+sudo systemctl disable firewalld
+```
+4. 禁用swap分区
+```bash
+# 临时关闭；关闭swap
+sudo swapoff -a
+# 永久关闭
+sudo sed -i '/swap/d' /etc/fstab
+# 可以通过这个命令查看swap是否关闭了
+free
+```
+5. 安装必要模块
+
+```bash
+yum install  -y ipvsadm ipset sysstat conntrack libseccomp
+# dummy0网卡和kube-ipvs0网卡：在安装k8s集群时，启用了ipvs的话，就会有这两个网卡。（将service的IP绑定在kube-ipvs0网卡上）
+cat > /etc/sysconfig/modules/ipvs.modules <<EOF
+#!/bin/bash
+ipvs_modules="ip_vs ip_vs_lc ip_vs_wlc ip_vs_rr ip_vs_wrr ip_vs_lblc ip_vs_lblcr ip_vs_dh ip_vs_sh ip_vs_fo ip_vs_nq ip_vs_sed ip_vs_ftp nf_conntrack ip_tables ip_set xt_set ipt_set ipt_rpfilter ipt_REJECT ipip "
+for kernel_module in \${ipvs_modules}; do
+  /sbin/modinfo -F filename \${kernel_module} > /dev/null 2>&1
+  if [ $? -eq 0 ]; then
+    /sbin/modprobe \${kernel_module}
+  fi
+done
+EOF
+
+chmod 755 /etc/sysconfig/modules/ipvs.modules 
+sh /etc/sysconfig/modules/ipvs.modules 
+lsmod | grep ip_vs
+
+# 转发 IPv4 并让 iptables 看到桥接流量
+cat <<EOF | sudo tee /etc/modules-load.d/k8s.conf
+overlay
+br_netfilter
+EOF
+
+sudo modprobe overlay
+sudo modprobe br_netfilter
+
+# 设置所需的 sysctl 参数，参数在重新启动后保持不变
+cat <<EOF | sudo tee /etc/sysctl.d/k8s.conf
+net.bridge.bridge-nf-call-iptables  = 1
+net.bridge.bridge-nf-call-ip6tables = 1
+net.ipv4.ip_forward                 = 1
+EOF
+
+# 应用 sysctl 参数而不重新启动
+sudo sysctl --system
+# 检查是否安装正确
+lsmod | grep br_netfilter
+lsmod | grep overlay
+
+# 确认 net.bridge.bridge-nf-call-iptables、net.bridge.bridge-nf-call-ip6tables 和 net.ipv4.ip_forward 系统变量在你的 sysctl 配置中被设置为 1
+sysctl net.bridge.bridge-nf-call-iptables net.bridge.bridge-nf-call-ip6tables net.ipv4.ip_forward
+```
+6. 运行时，选择 containerd
+```bash
+# 可以直接安装
+yum install -y containerd
+
+# 下载安装包，然后解压即可
+https://github.com/containerd/containerd/blob/main/docs/getting-started.md
+```
+7. 配置containerd，镜像加速，cgroup等
+```bash
+# 查看containerd版本
+containerd --version
+
+版本为 1.6.32
+
+# 配置为aliyun的镜像源
+mkdir /etc/containerd
+containerd config default > /etc/containerd/config.toml
+sed -i "s#registry.k8s.io/pause:3.8#registry.cn-hangzhou.aliyuncs.com/google_containers/pause:3.9#g"  /etc/containerd/config.toml
+
+# 配置镜像加速
+vim /etc/containerd/config.toml
+  [plugins."io.containerd.grpc.v1.cri".registry.mirrors]
+    [plugins."io.containerd.grpc.v1.cri".registry.mirrors."docker.io"]
+      endpoint = ["https://docker-mirror.h3d.com.cn"]
+
+# 配置cgroup
+vim /etc/containerd/config.toml
+[plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options]
+  SystemdCgroup = true
+```
+8. 配置k8s源
+
+```bash
+cat <<EOF > /etc/yum.repos.d/kubernetes.repo
+[kubernetes]
+name=Kubernetes
+baseurl=https://mirrors.aliyun.com/kubernetes/yum/repos/kubernetes-el7-x86_64/
+enabled=1
+gpgcheck=1
+repo_gpgcheck=1
+gpgkey=https://mirrors.aliyun.com/kubernetes/yum/doc/yum-key.gpg https://mirrors.aliyun.com/kubernetes/yum/doc/rpm-package-key.gpg
+EOF
+```
+9. 安装kubelet、kubeadm、kubectl(所有节点都需要)
+
+```bash
+# 查看可用版本
+yum list kubelet --showduplicates |grep 1.28
+
+# 安装
+yum install -y kubelet-1.28.2 kubeadm-1.28.2 kubectl-1.28.2 --disableexcludes=kubernetes
+systemctl enable --now kubelet
+```
+10. 配置crictl(如果想要在所有节点操作，可以都安装)
+
+```bash
+# 如果每个节点都需要crictl，可以安装并配置
+cat  <<EOF | sudo tee /etc/crictl.yaml
+runtime-endpoint: unix:///var/run/containerd/containerd.sock
+timeout: 5
+image-endpoint: unix:///var/run/containerd/containerd.sock
+
+EOF
+```
+11. 初始化(仅在master节点操作)
+
+```bash
+kubeadm init --kubernetes-version=1.28.15 \
+--apiserver-advertise-address=193.168.6.235  \
+--image-repository  registry.aliyuncs.com/google_containers \
+--pod-network-cidr=10.1.0.0/16
+--service-cidr=10.96.0.0/12
+```
+输出如下
+```bash
+Your Kubernetes control-plane has initialized successfully!
+
+To start using your cluster, you need to run the following as a regular user:
+
+  mkdir -p $HOME/.kube
+  sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+  sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+Alternatively, if you are the root user, you can run:
+
+  export KUBECONFIG=/etc/kubernetes/admin.conf
+
+You should now deploy a pod network to the cluster.
+Run "kubectl apply -f [podnetwork].yaml" with one of the options listed at:
+  https://kubernetes.io/docs/concepts/cluster-administration/addons/
+
+Then you can join any number of worker nodes by running the following on each as root:
+
+kubeadm join 192.168.6.235:6443 --token r10sv8.8wdmesq0hl16ztxy \
+    --discovery-token-ca-cert-hash sha256:fdcbd538e705dd0d68ea7d0aea289f09d1b3e461bab539c2f0b4262ae36762b9 
+```
+12. 按照初始化输出，进行操作，并添加master污点
+
+```bash
+mkdir -p $HOME/.kube
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
+export KUBECONFIG=/etc/kubernetes/admin.conf
+
+# 添加污点，避免业务进程调度到master节点
+kubectl taint nodes --all node-role.kubernetes.io/control-plane-
+```
+13. 检查集群状态
+
+```bash
+kubectl get nodes
+
+kubectl get pods -A
+```
+14. 安装网络插件
+
+```bash
+kubectl apply -f scripts/calico.yaml
+```
+
+15. 检查集群并添加worker节点
+
+```bash
+# 所有worker节点上执行
+kubeadm join 192.168.6.235:6443 --token r10sv8.8wdmesq0hl16ztxy \
+    --discovery-token-ca-cert-hash sha256:fdcbd538e705dd0d68ea7d0aea289f09d1b3e461bab539c2f0b4262ae36762b9 
+
+# 查看node状态
+kubectl get nodes
+```
+
+
+
 
 
 ## 安装K8s nimikube 学习测试版本
@@ -258,6 +517,8 @@ minikube start \
 uname -m
 # aarch64   aarch64就是arm架构
 ```
+kubectl get ns local-path-storage -o json | jq 'del(.spec.finalizers)'| kubectl replace --raw "/api/v1/namespaces/local-path-storage/finalize" -f -
+
 ## K8s命令
 ### 🧭 集群与上下文管理
 | 操作             | 命令 |

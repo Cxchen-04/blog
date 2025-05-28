@@ -54,7 +54,7 @@ pipeline {
                     sshagent (credentials: ["${env.SSH_CREDENTIALS_ID}"]) {
                         sh """
                             echo "🔄 重启 docker-compose"
-                            ssh ${DEPLOY_USER}@${DEPLOY_SERVER} 'cd ${DEPLOY_PATH} && docker compose restart nginx'
+                            ssh ${DEPLOY_USER}@${DEPLOY_SERVER} 'cd ${DEPLOY_PATH} && docker restart blog-nginx-1'
                         """
                     }
                 }

@@ -1,0 +1,104 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-conf
+  namespace: default
+data:
+  nginx.conf: |
+    worker_processes 1;
+    events {}
+    http {
+        include /etc/nginx/mime.types;
+        default_type text/html;
+        server {
+          listen 80;
+          server_name localhost;
+          root /var/www/html/public;
+          index index.html index.htm;
+          types {
+            application/javascript js mjs;
+            text/css css;
+          }
+          location / {
+            try_files $uri $uri/ /index.html;
+          }
+        }
+      }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: blog
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: myblog
+  template:
+    metadata:
+      labels:
+        app: myblog
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+        volumeMounts: # 这里的是容器内的挂载路径
+        - name: blog-volume
+          mountPath: /var/www/html/public
+        - name: nginx-config
+          mountPath: /etc/nginx/nginx.conf
+          subPath: nginx.conf
+      volumes: # 这里的是宿主机的挂载路径
+      - name: blog-volume
+        hostPath:
+          path: /root/deployemnt/nginx/public
+          type: Directory
+      - name: nginx-config
+        configMap:
+          name: nginx-conf
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: myblog-service
+#   namespace: default
+# spec:
+#   type: NodePort
+#   selector:
+#     app: myblog
+#   ports:
+#   - port: 80
+#     targetPort: 80
+#     nodePort: 31080
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: myblog-service
+  namespace: default
+spec:
+  type: ClusterIP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: blog-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: www.d.luelulu.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: myblog-service
+            port:
+              number: 80
