@@ -30,7 +30,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://www.luelulu.com/images/redefine-og.webp">
 <meta property="article:published_time" content="2025-05-24T07:17:08.000Z">
-<meta property="article:modified_time" content="2025-05-24T07:24:59.351Z">
+<meta property="article:modified_time" content="2025-05-24T09:10:46.171Z">
 <meta property="article:author" content="神秘路痴">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://www.luelulu.com/images/redefine-og.webp">
@@ -359,8 +359,8 @@
     
         <span class="article-date article-meta-item">
             <i class="fa-regular fa-wrench"></i>&nbsp;
-            <span class="desktop">2025-05-24 15:24:59</span>
-            <span class="mobile">2025-05-24 15:24:59</span>
+            <span class="desktop">2025-05-24 17:10:46</span>
+            <span class="mobile">2025-05-24 17:10:46</span>
             <span class="hover-info">更新</span>
         </span>
     
@@ -388,7 +388,41 @@
 
 		<div class="article-content markdown-body px-2 sm:px-6 md:px-8 pb-8">
 			<p>docker因为墙的问题很好解决，这篇主要是关于企业内网自建1.24版本之后的k8s集群，containerd无法拉取镜像的问题。</p>
-<h3 id="Docker"><a href="#Docker" class="headerlink" title="Docker"></a>Docker</h3><p>由于2024年6月开始国内的大量docker镜像停服😤，Docker无法下载安装镜像无法拉取😭 详情我在<a href="https://www.luelulu.com/2025/03/25/docker/#%E8%A7%A3%E5%86%B3%E5%9B%BD%E5%86%85Docker%E9%95%9C%E5%83%8F%E9%97%AE%E9%A2%98">docker</a>篇已经写过</p>
+<h3 id="Docker"><a href="#Docker" class="headerlink" title="Docker"></a>Docker</h3><p>由于2024年6月开始国内的大量docker镜像停服😤，Docker无法下载安装镜像无法拉取😭 详情我在<a href="https://www.luelulu.com/2025/03/25/docker/#%E8%A7%A3%E5%86%B3%E5%9B%BD%E5%86%85Docker%E9%95%9C%E5%83%8F%E9%97%AE%E9%A2%98">docker</a>篇已经写过。这里就不再赘述。</p>
+<h3 id="K8s-Containerd的运行时下"><a href="#K8s-Containerd的运行时下" class="headerlink" title="K8s Containerd的运行时下"></a>K8s Containerd的运行时下</h3><p>由于k8s在1.24版本弃用了docker的支持 所以更支持用containerd来跑容器，可是在我们在创建pod以及各种组件containerd都会默认去从dockerhub去拉取镜像，在这里不论我去containerd的config.toml文件下添加镜像源也不管事儿，拉取镜像都是失败。所以我直接用梯子的方式给我的内网集群都添加上了代理。</p>
+<p>可是在添加上全局代理之后，我的k8s还是拉不到镜像， 因为Kubernetes 的容器拉取行为由 容器运行时（如 containerd、Docker） 执行，它们运行在系统服务中，并 不继承你 shell 中的代理环境变量（如 ALL_PROXY）。<br>由于我的代理是用shadowsocks协议 是另一台海外的服务器自建的vpn隧道，我直接在本地的各个节点下载好客户端就行。<br>接下来 我们开启完整的操作步骤 让你的内网自建k8s集群也能轻松访问外网拉取到镜像。</p>
+<p>第一步：在公司服务器上安装 shadowsocks-libev（作为客户端）</p>
+<div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt update</span><br><span class="line"><span class="built_in">sudo</span> apt install shadowsocks-libev -y</span><br><span class="line"><span class="comment"># centos 就替换成 yum</span></span><br></pre></td></tr></table></figure></div>
+<p>第二步：配置 Shadowsocks 客户端</p>
+<div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> nano /etc/shadowsocks-libev/config.json</span><br></pre></td></tr></table></figure></div>
+<p>填入如下内容(改成你自己的)：</p>
+<div class="code-container" data-rel="Json"><figure class="iseeu highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;server&quot;</span><span class="punctuation">:</span><span class="string">&quot;123.123.123.123&quot;</span><span class="punctuation">,</span>        <span class="comment">// 你香港ECS的公网IP</span></span><br><span class="line">    <span class="attr">&quot;server_port&quot;</span><span class="punctuation">:</span><span class="number">8388</span><span class="punctuation">,</span>                <span class="comment">// SS端口</span></span><br><span class="line">    <span class="attr">&quot;local_port&quot;</span><span class="punctuation">:</span><span class="number">1080</span><span class="punctuation">,</span>                 <span class="comment">// 本地监听端口（默认1080）</span></span><br><span class="line">    <span class="attr">&quot;password&quot;</span><span class="punctuation">:</span><span class="string">&quot;your_password&quot;</span><span class="punctuation">,</span>        <span class="comment">// SS密码</span></span><br><span class="line">    <span class="attr">&quot;timeout&quot;</span><span class="punctuation">:</span><span class="number">300</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;method&quot;</span><span class="punctuation">:</span><span class="string">&quot;aes-256-gcm&quot;</span><span class="punctuation">,</span>            <span class="comment">// 加密方式，需与你的SS服务端一致</span></span><br><span class="line">    <span class="attr">&quot;fast_open&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">false</span></span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure></div>
+<p>第三步：启动 Shadowsocks 客户端</p>
+<div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> systemctl restart shadowsocks-libev-local</span><br><span class="line"><span class="built_in">sudo</span> systemctl <span class="built_in">enable</span> shadowsocks-libev-local</span><br></pre></td></tr></table></figure></div>
+<p>如果显示notfound话 那就代表没有守护进程 这里我们需要配置下守护进程</p>
+<ol>
+<li>我们用的是 ss-local 命令（客户端，绑定本地 127.0.0.1:1080）<div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">which</span> ss-local </span><br><span class="line">/usr/bin/ss-local   <span class="comment"># 复制这个</span></span><br><span class="line"><span class="comment"># 如果找不到，请先安装</span></span><br><span class="line"><span class="built_in">sudo</span> apt install shadowsocks-libev</span><br></pre></td></tr></table></figure></div></li>
+<li>创建 systemd 服务文件：<div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> nano /etc/systemd/system/ss-local.service</span><br></pre></td></tr></table></figure></div>
+填入以下内容（注意配置文件路径与你实际一致）：<div class="code-container" data-rel="Ini"><figure class="iseeu highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">[Unit]</span></span><br><span class="line"><span class="attr">Description</span>=Shadowsocks Local Client Service</span><br><span class="line"><span class="attr">After</span>=network.target</span><br><span class="line"></span><br><span class="line"><span class="section">[Service]</span></span><br><span class="line"><span class="attr">ExecStart</span>=/usr/bin/ss-local -c /etc/shadowsocks-libev/config.json</span><br><span class="line"><span class="attr">Restart</span>=<span class="literal">on</span>-failure</span><br><span class="line"></span><br><span class="line"><span class="section">[Install]</span></span><br><span class="line"><span class="attr">WantedBy</span>=multi-user.target</span><br></pre></td></tr></table></figure></div>
+如果 ss-local 路径不是 &#x2F;usr&#x2F;bin&#x2F;ss-local，请用 which ss-local 替换它。</li>
+<li>重新加载 systemd 并启动服务：<div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> systemctl daemon-reexec</span><br><span class="line"><span class="built_in">sudo</span> systemctl daemon-reload</span><br><span class="line"></span><br><span class="line"><span class="built_in">sudo</span> systemctl start ss-local.service</span><br><span class="line"><span class="built_in">sudo</span> systemctl <span class="built_in">enable</span> ss-local.service</span><br><span class="line"><span class="comment"># 查看状态确认是否启动成功</span></span><br><span class="line"><span class="built_in">sudo</span> systemctl status ss-local.service</span><br></pre></td></tr></table></figure></div>
+✅ 启动成功后，你的本地 127.0.0.1:1080 就可以作为 socks5 代理使用了：<div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl --socks5-hostname 127.0.0.1:1080 https://google.com</span><br></pre></td></tr></table></figure></div>
+🧪 附：测试 IP 是否成功通过代理<div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl --socks5-hostname 127.0.0.1:1080 cip.cc</span><br></pre></td></tr></table></figure></div>
+第四步：使用 Privoxy 转换 SOCKS5 → HTTP<br>这里你会发现containerd还是拉取不了镜像，这里我们就需要一个Privoxy工具将SOCKS5→HTTP</li>
+</ol>
+<p>安装并配置privoxy</p>
+<div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt install privoxy -y</span><br><span class="line"><span class="comment"># 配置 Privoxy 将 HTTP 请求转发给 ss-local 的 SOCKS5 端口</span></span><br><span class="line"><span class="built_in">sudo</span> nano /etc/privoxy/config</span><br></pre></td></tr></table></figure></div>
+<p>添加一行（放到文件最后）：</p>
+<div class="code-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">forward-socks5t / 127.0.0.1:1080 . </span><br></pre></td></tr></table></figure></div>
+<p>启动并检查端口监听</p>
+<div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> systemctl restart privoxy</span><br><span class="line"><span class="built_in">sudo</span> systemctl <span class="built_in">enable</span> privoxy</span><br><span class="line"><span class="comment"># 检查监听：</span></span><br><span class="line">ss -tuln | grep 8118</span><br><span class="line"><span class="comment"># 你应该能看到：</span></span><br><span class="line">127.0.0.1:8118</span><br></pre></td></tr></table></figure></div>
+<p>第五步：为容器运行时配置代理</p>
+<ol>
+<li>创建或编辑代理配置文件（containerd 使用 systemd 启动）：<div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> <span class="built_in">mkdir</span> -p /etc/systemd/system/containerd.service.d</span><br><span class="line"><span class="built_in">sudo</span> nano /etc/systemd/system/containerd.service.d/http-proxy.conf</span><br></pre></td></tr></table></figure></div></li>
+<li>内容如下（请改为你实际使用的代理端口）：<div class="code-container" data-rel="Ini"><figure class="iseeu highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">[Service]</span></span><br><span class="line"><span class="attr">Environment</span>=<span class="string">&quot;HTTP_PROXY=http://127.0.0.1:8118&quot;</span></span><br><span class="line"><span class="attr">Environment</span>=<span class="string">&quot;HTTPS_PROXY=http://127.0.0.1:8118&quot;</span></span><br><span class="line"><span class="attr">Environment</span>=<span class="string">&quot;NO_PROXY=127.0.0.1,localhost,10.0.0.0/8,192.168.0.0/16&quot;</span></span><br></pre></td></tr></table></figure></div>
+🧠 注意：<br>•	containerd 不能直接识别 SOCKS5，所以需要用一个额外的本地 HTTP 代理转接 SOCKS5，或者让 ss-local 启动一个 http-local 端口</li>
+</ol>
+<p>这样我们就可以直接用containerd来拉取镜像了！</p>
 
 		</div>
 
@@ -403,7 +437,7 @@
         
             <li>
                 <strong>更新于
-                    :</strong> 2025-05-24 15:24:59
+                    :</strong> 2025-05-24 17:10:46
             </li>
         
         <li>
@@ -433,12 +467,12 @@
     <div class="recommended-article-header text-xl md:text-3xl font-bold mt-10">
      <i aria-hidden="true"></i><span>推荐阅读</span>
     </div>
-    <div class="recommended-article-group"><a class="recommended-article-item" href="/2025/03/25/docker/" title="Docker" rel="bookmark">
-  <img src="/images/docker.webp" alt="Docker" class="!max-w-none">
-  <span class="title">Docker</span>
-</a><a class="recommended-article-item" href="/2025/04/13/Kubernetes/" title="Kubernetes / K8s" rel="bookmark">
+    <div class="recommended-article-group"><a class="recommended-article-item" href="/2025/04/13/Kubernetes/" title="Kubernetes / K8s" rel="bookmark">
   <img src="/images/k8s.png" alt="Kubernetes / K8s" class="!max-w-none">
   <span class="title">Kubernetes / K8s</span>
+</a><a class="recommended-article-item" href="/2025/03/25/docker/" title="Docker" rel="bookmark">
+  <img src="/images/docker.webp" alt="Docker" class="!max-w-none">
+  <span class="title">Docker</span>
 </a><a class="recommended-article-item" href="/2025/04/23/Ansible/" title="Ansible" rel="bookmark">
   <img src="/images/ansible.png" alt="Ansible" class="!max-w-none">
   <span class="title">Ansible</span>
@@ -448,12 +482,12 @@
    <div class="recommended-article-header text-xl md:text-3xl font-bold mt-10">
      <i aria-hidden="true"></i><span>推荐阅读</span>
    </div>
-   <div class="recommended-article-group"><a class="recommended-article-item" href="/2025/03/25/docker/" title="Docker" rel="bookmark">
-  <img src="/images/docker.webp" alt="Docker" class="!max-w-none">
-  <span class="title">Docker</span>
-</a><a class="recommended-article-item" href="/2025/04/13/Kubernetes/" title="Kubernetes / K8s" rel="bookmark">
+   <div class="recommended-article-group"><a class="recommended-article-item" href="/2025/04/13/Kubernetes/" title="Kubernetes / K8s" rel="bookmark">
   <img src="/images/k8s.png" alt="Kubernetes / K8s" class="!max-w-none">
   <span class="title">Kubernetes / K8s</span>
+</a><a class="recommended-article-item" href="/2025/03/25/docker/" title="Docker" rel="bookmark">
+  <img src="/images/docker.webp" alt="Docker" class="!max-w-none">
+  <span class="title">Docker</span>
 </a></div>
    </div>
   </div>
@@ -530,7 +564,7 @@
 	<div class="post-toc">
 		<div class="toc-title">目录</div>
 		<div class="page-title">Docker/Kubernetes内网生产环境导致镜像无法拉取</div>
-		<ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Docker"><span class="nav-text">Docker</span></a></li></ol>
+		<ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Docker"><span class="nav-text">Docker</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#K8s-Containerd%E7%9A%84%E8%BF%90%E8%A1%8C%E6%97%B6%E4%B8%8B"><span class="nav-text">K8s Containerd的运行时下</span></a></li></ol>
 
 	</div>
 </div>
