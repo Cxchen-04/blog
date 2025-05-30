@@ -1,0 +1,54 @@
+loki:  # 日志系统
+  enabled: true
+  isDefault: true
+  persistence:
+    enabled: true
+    size: 5Gi
+    storageClassName: "local-path"
+
+promtail:
+  enabled: true
+  serviceMonitor:
+    enabled: false
+
+grafana:   # grafana
+  enabled: true
+  adminUser: admin
+  adminPassword: admin123
+
+  persistence:
+    enabled: true
+    size: 2Gi
+    storageClassName: "local-path"
+  
+  service:
+    type: ClusterIP
+  
+  ingress:
+    enabled: true
+    annotations:
+      kubernetes.io/ingress.class: "nginx"
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    hosts:
+      - grafana.local
+    tls:
+      - secretName: grafana-tls
+        hosts:
+          - grafana.local
+
+prometheus:     # prometheus
+  enabled: true
+  alertmanager:
+    enabled: true
+  pushgateway:
+    enabled: false
+  nodeExporter:
+    enabled: true
+  server:
+    persistentVolume:
+      enabled: true
+      size: 5Gi
+      storageClassName: local-path
+
+fluent-bit:
+  enabled: false
