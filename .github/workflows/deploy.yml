@@ -63,18 +63,18 @@ jobs:
         - name: 上传public
           uses: appleboy/scp-action@v0.1.7
           with:
-            host: 8.218.189.240
+            host: 47.86.4.143
             username: root
             key: ${{ secrets.SERVER_SSH_KEY }}
             source: public/**
-            target: ~/blog
+            target: ~/nginx
             
         - name: SSH into server and restart services 重启docker
           uses: appleboy/ssh-action@v0.1.8
           with:
-            host: 8.218.189.240
+            host: 47.86.4.143
             username: root
             key: ${{ secrets.SERVER_SSH_KEY }}
             script: |
-              cd ~/blog
+              cd ~/nginx
               docker restart blog-nginx-1 

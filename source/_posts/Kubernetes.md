@@ -664,7 +664,8 @@ Helm 是“打包部署模板”系统，Kustomize 是“YAML 衍生变种”系
 
 Kustomize 是 Kubernetes 原生支持的配置管理工具（kubectl 从 1.14 起内置支持），它通过覆盖和组合 YAML 文件来实现“相同基础、不同环境”的部署配置。
 
-你不用写模板语法（像 Helm 的 {{ }}），而是通过文件夹 + patch 的形式组合 YAML。
+你不用写模板语法（像 Helm 的 { { } } ），而是通过文件夹 + patch 的形式组合 YAML。
+
 🧱 Kustomize 的结构（典型目录示例）：
 ```bash
 my-app/
@@ -680,6 +681,7 @@ my-app/
 │   │   ├── kustomization.yaml
 │   │   └── patch.yaml
 ```
+
 📌 Kustomize 支持的功能：
 
 | 功能                          | 说明                                      |
