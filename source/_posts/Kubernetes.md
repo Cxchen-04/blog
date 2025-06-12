@@ -592,3 +592,187 @@ kubectl get ns local-path-storage -o json | jq 'del(.spec.finalizers)'| kubectl 
 | 临时启动容器     | `kubectl run -it --rm debug --image=busybox -- /bin/sh` |
 | 导出资源为 YAML | `kubectl get deployment <name> -o yaml > deployment.yaml` |
 
+
+## Helm K8s的「包管理工具」
+### 什么是 Chart？它有什么作用？
+Chart 是 Helm 的核心概念，简单说就是：
+
+Chart 是一个打包好的 Kubernetes 应用模板，包含了一组 YAML 文件 + 参数配置文件。
+
+一个 Chart 包含的内容通常如下：
+```bash
+mychart/
+├── Chart.yaml           # Chart 的元信息（名称、版本等）
+├── values.yaml          # 默认参数（可被 -f 覆盖）
+├── templates/           # 存放实际的 YAML 模板
+│   ├── deployment.yaml
+│   ├── service.yaml
+│   └── _helpers.tpl     # 公共模板函数
+```
+Chart 的作用：
+
+| 作用       | 说明                                                                 |
+|------------|----------------------------------------------------------------------|
+| 📦 打包       | 把一套复杂的部署逻辑（Deployment、Service、Ingress 等）统一封装     |
+| 🔁 复用       | 你可以反复在不同集群、不同环境中使用它，只需要传不同参数              |
+| 🧩 参数化     | 通过 `values.yaml` 配置文件，灵活控制副本数、镜像、端口等             |
+| 🔍 版本管理   | Chart 支持版本控制，与 Helm release 一起回滚升级                     |
+| 🚀 快速部署   | 一条命令即可部署复杂应用（例如 Loki、Prometheus、GitLab 等）         |
+
+
+### helm命令
+##### 📦 Chart 仓库管理
+```bash
+helm repo add <name> <url>             # 添加 Helm 仓库
+helm repo list                         # 查看已添加的仓库
+helm repo update                       # 更新仓库信息
+helm search repo <keyword>             # 在仓库中搜索 chart
+```
+##### 📥 安装 / 升级
+```bash
+helm install <release-name> <chart> -n <namespace> -f <values.yaml>
+# 安装一个 chart，比如：
+# helm install loki grafana/loki-stack -n monitor -f loki-values.yaml
+
+helm upgrade <release-name> <chart> -n <namespace> -f <values.yaml>
+# 升级已有的 release，但不会自动安装
+
+helm upgrade --install <release-name> <chart> ...
+# 安装或升级（推荐用于脚本或 CI/CD）
+
+helm uninstall <release-name> -n <namespace>
+# 卸载 release
+
+helm rollback <release-name> <revision> -n <namespace>
+# 回滚到历史版本
+```
+##### 🔍 状态 / 日志 / 调试
+```bash
+helm list -n <namespace>             # 查看某个命名空间下的 release
+helm status <release-name> -n <namespace>  # 查看 release 状态
+helm get values <release-name> -n <namespace>       # 查看已部署时使用的 values
+helm get manifest <release-name> -n <namespace>     # 查看渲染后的 Kubernetes YAML
+helm history <release-name> -n <namespace>          # 查看历史版本
+```
+
+## Kustomize 是什么
+🧩 一句话总结 Helm 与 Kustomize 的区别：
+
+Helm 是“打包部署模板”系统，Kustomize 是“YAML 衍生变种”系统。
+
+📦 Kustomize 是什么？
+
+Kustomize 是 Kubernetes 原生支持的配置管理工具（kubectl 从 1.14 起内置支持），它通过覆盖和组合 YAML 文件来实现“相同基础、不同环境”的部署配置。
+
+你不用写模板语法（像 Helm 的 {{ }}），而是通过文件夹 + patch 的形式组合 YAML。
+🧱 Kustomize 的结构（典型目录示例）：
+```bash
+my-app/
+├── base/   # 基础部署逻辑，适用于所有环境
+│   ├── deployment.yaml
+│   ├── service.yaml
+│   └── kustomization.yaml
+├── overlays/  # 环境专属配置，通过 patch 或变量覆盖基础配置
+│   ├── dev/
+│   │   ├── kustomization.yaml
+│   │   └── patch.yaml
+│   ├── prod/
+│   │   ├── kustomization.yaml
+│   │   └── patch.yaml
+```
+📌 Kustomize 支持的功能：
+
+| 功能                          | 说明                                      |
+|-------------------------------|-------------------------------------------|
+| namePrefix / nameSuffix       | 给资源名加前缀 / 后缀，避免冲突           |
+| configMapGenerator / secretGenerator | 自动生成 ConfigMap / Secret         |
+| patchesStrategicMerge         | 部分字段打补丁                            |
+| images 替换                   | 可以指定镜像版本                          |
+| 资源合并 / 继承               | 支持多层嵌套管理 base 和 overlay           |
+
+🔍 Helm vs Kustomize：核心对比表
+
+| 项目           | Helm                                           | Kustomize                                           |
+|----------------|------------------------------------------------|-----------------------------------------------------|
+| 模板机制       | Go 模板语法 `{{ }}`，灵活但复杂               | 原生 YAML + Patch，简单直观                         |
+| 应用封装       | 支持 Chart 打包，版本控制                      | 无打包，仅结构化组织目录                            |
+| 参数注入方式   | values.yaml                                     | patch.yaml + kustomization.yaml                     |
+| 适合场景       | 第三方应用部署（如 Prometheus、Harbor）        | 自研项目多环境管理（如 dev/test/prod）              |
+| 发布版本回滚   | Helm 有 Release 管理，支持版本和回滚           | 无 Release 概念，靠 Git 控制                        |
+| 安装方式       | `helm install`                                 | `kubectl apply -k` 或 `kustomize build`             |
+
+
+🧠 可以这样记：
+Helm 更像是：yum / apt —— 安装别人做好的包（官方、第三方组件）
+	•	Kustomize 更像是：自己写 docker-compose.override.yml —— 在自己 YAML 基础上做灵活的环境变体管理
+
+🚀 举个实际例子
+```bash
+# 你在用 Helm 安装 Grafana：
+helm install grafana grafana/grafana -f prod-values.yaml
+
+# 你在用 Kustomize 部署自己开发的 app：
+kubectl apply -k overlays/prod
+```
+
+
+## K8s进阶
+
+① 调度相关
+	•	NodeSelector / Affinity / Taints & Tolerations：精细控制 Pod 在哪些节点上运行。
+	•	nodeSelector：简单标签匹配。
+	•	affinity：支持多条件、亲和/反亲和调度。
+	•	taints & tolerations：用于“拒绝非特定容忍条件的 Pod”调度。
+	•	优先级与抢占（Priority & Preemption）：高优先级的 Pod 可以驱逐低优先级 Pod。
+
+⸻
+
+② 工作负载控制器
+	•	StatefulSet：适用于有状态应用（如数据库），提供稳定的网络标识和持久存储。
+	•	DaemonSet：确保每个节点都运行一个 Pod（常用于日志采集、监控等）。
+	•	Job / CronJob：一次性任务或周期性任务，类似 Linux 的 cron。
+	•	Horizontal Pod Autoscaler（HPA）：根据 CPU 或自定义指标自动伸缩 Pod 数量。
+	•	Vertical Pod Autoscaler（VPA）：自动调整 Pod 的资源请求（目前在很多场景下仍谨慎使用）。
+	•	Cluster Autoscaler：节点资源不足时自动扩容底层节点。
+
+⸻
+
+③ 网络与服务发现
+	•	NetworkPolicy：K8s 的防火墙，可以限制 Pod 间通信。
+	•	Service Mesh（如 Istio、Linkerd）：用于流量管理、服务观察、熔断、A/B 测试等高级服务治理。
+
+⸻
+
+④ 存储与数据管理
+	•	StorageClass：定义不同的存储策略（慢速、高IO等），与 PVC 配合使用。
+	•	VolumeSnapshot / VolumeClone：实现 PVC 快照和克隆（适合备份、还原）。
+	•	CSI（Container Storage Interface）：插件化的存储驱动标准，支持云厂商和自定义存储。
+
+⸻
+
+⑤ 安全
+	•	RBAC（Role-Based Access Control）：基于角色的权限控制。
+	•	PodSecurityPolicy（已废弃）/ Pod Security Admission：控制 Pod 的安全行为（如是否允许特权模式）。
+	•	NetworkPolicy：限制网络访问权限。
+	•	ServiceAccount & Secrets：身份管理和加密敏感信息。
+
+⸻
+
+⑥ 可观测性与调试
+	•	Events / Probes / Metrics API：诊断运行状况。
+	•	日志采集：Loki / ELK / Fluentd / Promtail：结合 DaemonSet 收集集群日志。
+	•	Tracing：使用 Jaeger/Zipkin 等进行分布式追踪。
+	•	监控告警：Prometheus + Grafana + Alertmanager：完整的指标、告警、可视化体系。
+
+⸻
+
+⑦ 高级部署策略
+	•	Canary / Blue-Green / RollingUpdate / Recreate：支持多种升级策略。
+	•	Kustomize / Helm：更强大的资源打包和管理方式，适合复杂项目。
+
+⸻
+
+⑧ 平台扩展能力
+	•	Operator（CRD + Controller）：自定义控制器管理非原生资源，比如部署自己的数据库、缓存。
+	•	Webhooks（Mutating / Validating）：用来在资源创建前做拦截和修改。
+	•	Admission Controller：控制资源创建和更新的“守门员”。
