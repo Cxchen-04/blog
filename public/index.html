@@ -427,7 +427,7 @@
 
         <div class="statistics flex justify-around my-2.5">
     <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/tags">
-        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">10</div>
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">11</div>
         <div class="label text-third-text-color text-sm">标签</div>
     </a>
     <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/categories">
@@ -504,7 +504,7 @@
 </div>
                 <div class="statistics flex justify-around my-2.5">
     <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/tags">
-        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">10</div>
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">11</div>
         <div class="label text-third-text-color text-sm">标签</div>
     </a>
     <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/categories">
@@ -545,9 +545,11 @@
                     <div class="home-article-content markdown-body">
                         
                             
-                            背景随着各类大型语言模型逐渐走向实际应用，如何在不同模型、不同服务之间传递并维护上下文成为新的挑战。传统的 API 更多关注单次请求与响应，但在多轮对话以及长时间会话的场景下，缺乏统一的上下文管理手段往往导致模型理解偏差或状态错乱。MCP（Model Context Protocol）正是在这样的需求下提出的一套标准化协议，旨在规范大模型在生成式对话中的上下文表示与交互方式。
-协议目标
-统一...
+                            背景与聊天机器人交流时，大模型需要记住之前的内容，才能给出连贯的回答。这些历史消息就叫做“上下文”。如果上下文丢失，模型就会答非所问。MCP（Model Context Protocol）是一套简单的记录规则，帮助我们在不同系统间共享这些对话信息。
+为什么要用 MCP
+统一格式：所有服务都按同一种方式保存和读取对话，避免混乱。
+模型互通：一套协议即可让多个模型或插件共享上下文。
+可追溯：消息...
                         
                     </div>
 
@@ -1033,7 +1035,12 @@ CI&#x2F;CD 是干嘛的1234567891011你写代码 → 推送到 GitHub / GitLab .
                     <div class="home-article-content markdown-body">
                         
                             
-                            
+                            什么是 ShellShell 是 Linux 和 Unix 系统中的 “命令行解释器”，它允许我们通过文本命令来和系统交互。最常见的 Bash 既是一门脚本语言，又提供了强大的自动化能力。
+为什么运维要学 Shell
+批量操作：通过脚本一次处理多台服务器或大量文件。
+自动化：定时任务、监控脚本、部署脚本都离不开它。
+成本低：系统自带，无需额外安装。
+可移植：脚本在各 Linux 发行版间基本...
                         
                     </div>
 
@@ -1110,21 +1117,27 @@ CI&#x2F;CD 是干嘛的1234567891011你写代码 → 推送到 GitHub / GitLab .
                 
                     <div id="home-article-thumbnail" class="home-article-thumbnail relative h-[150px] overflow-hidden rounded-t-large">
                         <a href="/2025/03/26/Python/">
-                            <img src="/images/python.png" alt="Python" class="w-full h-full object-cover dark:brightness-75 transition-all" />
+                            <img src="/images/python.png" alt="Python 在 Linux 运维中的应用" class="w-full h-full object-cover dark:brightness-75 transition-all" />
                         </a>
                     </div>
                 
                 <div class="flex flex-col gap-5 px-7 pb-7 pt-5">
                     <h3 class="home-article-title">
                         <a href="/2025/03/26/Python/">
-                            Python
+                            Python 在 Linux 运维中的应用
                         </a>
                     </h3>
 
                     <div class="home-article-content markdown-body">
                         
                             
-                            
+                            Python 简介Python 是一门简洁易读的编程语言，非常适合用来编写自动化脚本和运维工具。相比仅能执行简单命令的 Shell，Python 拥有更完善的语法、海量的第三方库以及跨平台能力，因此能更好地应对复杂场景。
+
+易上手：语法直观，入门门槛低。
+生态丰富：拥有成千上万的第三方库，可快速实现网络请求、数据处理、图形化等功能。
+可扩展：既能写几行脚本，也能构建大型应用。
+
+下面的内容将...
                         
                     </div>
 
@@ -1146,7 +1159,7 @@ CI&#x2F;CD 是干嘛的1234567891011你写代码 → 推送到 GitHub / GitLab .
                     
                         
                         <li>
-                            <a href="/categories/%E6%9C%8D%E5%8A%A1%E7%AB%AF/">服务端</a>&nbsp;
+                            <a href="/categories/%E8%BF%90%E7%BB%B4/">运维</a>&nbsp;
                         </li>
                     
                     
@@ -1156,7 +1169,7 @@ CI&#x2F;CD 是干嘛的1234567891011你写代码 → 推送到 GitHub / GitLab .
                             <li>></li>
                         
                         <li>
-                            <a href="/categories/%E6%9C%8D%E5%8A%A1%E7%AB%AF/Python/">Python</a>&nbsp;
+                            <a href="/categories/%E8%BF%90%E7%BB%B4/Python/">Python</a>&nbsp;
                         </li>
                     
                     
@@ -1171,7 +1184,17 @@ CI&#x2F;CD 是干嘛的1234567891011你写代码 → 推送到 GitHub / GitLab .
                     
                         <li>
                             
-                            <a href="/tags/%E6%9C%8D%E5%8A%A1%E7%AB%AF%EF%BC%8CPython/">服务端，Python</a>&nbsp;
+                            <a href="/tags/%E8%BF%90%E7%BB%B4/">运维</a>&nbsp;
+                        </li>
+                    
+                        <li>
+                            | 
+                            <a href="/tags/Python/">Python</a>&nbsp;
+                        </li>
+                    
+                        <li>
+                            | 
+                            <a href="/tags/%E8%87%AA%E5%8A%A8%E5%8C%96/">自动化</a>&nbsp;
                         </li>
                     
                 </ul>
@@ -1179,7 +1202,7 @@ CI&#x2F;CD 是干嘛的1234567891011你写代码 → 推送到 GitHub / GitLab .
         
     </div>
 
-    <a href="/2025/03/26/Python/">阅读全文<span class="seo-reader-text">Python</span>&nbsp;<i class="fa-solid fa-angle-right"></i></a>
+    <a href="/2025/03/26/Python/">阅读全文<span class="seo-reader-text">Python 在 Linux 运维中的应用</span>&nbsp;<i class="fa-solid fa-angle-right"></i></a>
 </div>
 
                 </div>

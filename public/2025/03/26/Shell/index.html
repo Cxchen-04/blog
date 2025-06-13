@@ -30,7 +30,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://www.luelulu.com/images/redefine-og.webp">
 <meta property="article:published_time" content="2025-03-26T05:58:05.000Z">
-<meta property="article:modified_time" content="2025-03-30T08:50:15.484Z">
+<meta property="article:modified_time" content="2025-06-13T15:49:44.957Z">
 <meta property="article:author" content="神秘路痴">
 <meta property="article:tag" content="服务端">
 <meta property="article:tag" content="Shell">
@@ -302,7 +302,7 @@
 
         <div class="statistics flex justify-around my-2.5">
     <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/tags">
-        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">10</div>
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">11</div>
         <div class="label text-third-text-color text-sm">标签</div>
     </a>
     <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/categories">
@@ -365,8 +365,8 @@
     
         <span class="article-date article-meta-item">
             <i class="fa-regular fa-wrench"></i>&nbsp;
-            <span class="desktop">2025-03-30 16:50:15</span>
-            <span class="mobile">2025-03-30 16:50:15</span>
+            <span class="desktop">2025-06-13 23:49:44</span>
+            <span class="mobile">2025-06-13 23:49:44</span>
             <span class="hover-info">更新</span>
         </span>
     
@@ -434,7 +434,66 @@
 
 
 		<div class="article-content markdown-body px-2 sm:px-6 md:px-8 pb-8">
-			
+			<h2 id="什么是-Shell"><a href="#什么是-Shell" class="headerlink" title="什么是 Shell"></a>什么是 Shell</h2><p>Shell 是 Linux 和 Unix 系统中的 “命令行解释器”，它允许我们通过文本命令来和系统交互。最常见的 Bash 既是一门脚本语言，又提供了强大的自动化能力。</p>
+<h3 id="为什么运维要学-Shell"><a href="#为什么运维要学-Shell" class="headerlink" title="为什么运维要学 Shell"></a>为什么运维要学 Shell</h3><ul>
+<li><strong>批量操作</strong>：通过脚本一次处理多台服务器或大量文件。</li>
+<li><strong>自动化</strong>：定时任务、监控脚本、部署脚本都离不开它。</li>
+<li><strong>成本低</strong>：系统自带，无需额外安装。</li>
+<li><strong>可移植</strong>：脚本在各 Linux 发行版间基本通用。</li>
+</ul>
+<h2 id="第一个脚本"><a href="#第一个脚本" class="headerlink" title="第一个脚本"></a>第一个脚本</h2><div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;Hello World&quot;</span></span><br></pre></td></tr></table></figure></div>
+<p>保存为 <code>hello.sh</code>，给执行权限后运行：</p>
+<div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">chmod</span> +x hello.sh</span><br><span class="line">./hello.sh</span><br></pre></td></tr></table></figure></div>
+
+<h2 id="基本语法"><a href="#基本语法" class="headerlink" title="基本语法"></a>基本语法</h2><h3 id="变量与字符串"><a href="#变量与字符串" class="headerlink" title="变量与字符串"></a>变量与字符串</h3><div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">name=<span class="string">&quot;Bob&quot;</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;Hello, <span class="variable">$name</span>&quot;</span></span><br></pre></td></tr></table></figure></div>
+<ul>
+<li>使用 <code>$(command)</code> 可以获取命令结果：<div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">files=$(<span class="built_in">ls</span> /etc | <span class="built_in">wc</span> -l)</span><br></pre></td></tr></table></figure></div></li>
+</ul>
+<h3 id="条件判断"><a href="#条件判断" class="headerlink" title="条件判断"></a>条件判断</h3><div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> [ -f /etc/passwd ]; <span class="keyword">then</span></span><br><span class="line">  <span class="built_in">echo</span> <span class="string">&quot;文件存在&quot;</span></span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">  <span class="built_in">echo</span> <span class="string">&quot;文件不存在&quot;</span></span><br><span class="line"><span class="keyword">fi</span></span><br></pre></td></tr></table></figure></div>
+<p>支持 <code>-f</code> (文件存在)、<code>-d</code> (目录存在) 等多种条件表达式。</p>
+<h3 id="循环"><a href="#循环" class="headerlink" title="循环"></a>循环</h3><h4 id="for"><a href="#for" class="headerlink" title="for"></a>for</h4><div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> user <span class="keyword">in</span> alice bob carol; <span class="keyword">do</span></span><br><span class="line">  <span class="built_in">echo</span> <span class="string">&quot;欢迎 <span class="variable">$user</span>&quot;</span></span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure></div>
+<h4 id="while"><a href="#while" class="headerlink" title="while"></a>while</h4><div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">counter=0</span><br><span class="line"><span class="keyword">while</span> [ <span class="variable">$counter</span> -lt 5 ]; <span class="keyword">do</span></span><br><span class="line">  <span class="built_in">echo</span> <span class="string">&quot;计数: <span class="variable">$counter</span>&quot;</span></span><br><span class="line">  counter=$((counter+<span class="number">1</span>))</span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure></div>
+
+<h3 id="函数"><a href="#函数" class="headerlink" title="函数"></a>函数</h3><div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="title">backup_file</span></span>() &#123;</span><br><span class="line">  src=<span class="variable">$1</span></span><br><span class="line">  dest=<span class="variable">$2</span></span><br><span class="line">  <span class="built_in">cp</span> <span class="string">&quot;<span class="variable">$src</span>&quot;</span> <span class="string">&quot;<span class="variable">$dest</span>&quot;</span></span><br><span class="line">&#125;</span><br><span class="line">backup_file /etc/hosts /tmp/hosts.bak</span><br></pre></td></tr></table></figure></div>
+<p>函数让脚本结构更清晰，也方便复用。</p>
+<h2 id="常见运维场景"><a href="#常见运维场景" class="headerlink" title="常见运维场景"></a>常见运维场景</h2><h3 id="批量执行命令"><a href="#批量执行命令" class="headerlink" title="批量执行命令"></a>批量执行命令</h3><p>借助 <code>for</code> 循环和 <code>ssh</code> 可以对多台服务器批量操作：</p>
+<div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">servers=<span class="string">&quot;192.168.1.10 192.168.1.11&quot;</span></span><br><span class="line"><span class="keyword">for</span> host <span class="keyword">in</span> <span class="variable">$servers</span>; <span class="keyword">do</span></span><br><span class="line">  ssh root@<span class="variable">$host</span> <span class="string">&quot;systemctl restart nginx&quot;</span></span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure></div>
+
+<h3 id="日志监控"><a href="#日志监控" class="headerlink" title="日志监控"></a>日志监控</h3><p>使用 <code>tail -f</code> 实时查看日志并配合条件触发告警：</p>
+<div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">tail</span> -f /var/log/nginx/access.log | <span class="keyword">while</span> <span class="built_in">read</span> line; <span class="keyword">do</span></span><br><span class="line">  <span class="built_in">echo</span> <span class="string">&quot;<span class="variable">$line</span>&quot;</span> | grep <span class="string">&quot;500&quot;</span> &amp;&amp; <span class="built_in">echo</span> <span class="string">&quot;发现 500 错误&quot;</span></span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure></div>
+
+<h3 id="自动备份"><a href="#自动备份" class="headerlink" title="自动备份"></a>自动备份</h3><div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line">src=/data</span><br><span class="line">bak=/backup/$(<span class="built_in">date</span> +%F)</span><br><span class="line"><span class="built_in">mkdir</span> -p <span class="string">&quot;<span class="variable">$bak</span>&quot;</span></span><br><span class="line"><span class="built_in">cp</span> -r <span class="string">&quot;<span class="variable">$src</span>&quot;</span> <span class="string">&quot;<span class="variable">$bak</span>&quot;</span></span><br></pre></td></tr></table></figure></div>
+<p>搭配 <code>crontab</code> 定时执行即可完成每日备份。</p>
+<h2 id="自动化技巧"><a href="#自动化技巧" class="headerlink" title="自动化技巧"></a>自动化技巧</h2><ol>
+<li><strong>结合 crontab 定时运行脚本</strong>：<div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 每天凌晨 2 点备份</span></span><br><span class="line">0 2 * * * /usr/local/bin/backup.sh</span><br></pre></td></tr></table></figure></div></li>
+<li><strong>环境变量管理</strong>：在脚本开头使用 <code>export</code> 设置变量，或加载 <code>.env</code> 文件。</li>
+<li><strong>日志记录</strong>：<code>exec &gt;&gt;/var/log/myscript.log 2&gt;&amp;1</code> 可把脚本输出写入日志文件。</li>
+<li><strong>使用 set -euo pipefail 提高健壮性</strong>：<div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"><span class="built_in">set</span> -euo pipefail</span><br></pre></td></tr></table></figure></div></li>
+</ol>
+<h2 id="实战示例：一键部署-Web-服务"><a href="#实战示例：一键部署-Web-服务" class="headerlink" title="实战示例：一键部署 Web 服务"></a>实战示例：一键部署 Web 服务</h2><div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"><span class="built_in">set</span> -e</span><br><span class="line">app_src=/opt/app</span><br><span class="line">web_root=/var/www/html</span><br><span class="line"></span><br><span class="line"><span class="comment"># 安装依赖</span></span><br><span class="line">apt update &amp;&amp; apt install -y nginx git</span><br><span class="line"></span><br><span class="line"><span class="comment"># 拉取代码并部署</span></span><br><span class="line"><span class="keyword">if</span> [ ! -d <span class="string">&quot;<span class="variable">$app_src</span>&quot;</span> ]; <span class="keyword">then</span></span><br><span class="line">  git <span class="built_in">clone</span> https://example.com/repo.git <span class="string">&quot;<span class="variable">$app_src</span>&quot;</span></span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">  git -C <span class="string">&quot;<span class="variable">$app_src</span>&quot;</span> pull</span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"><span class="built_in">cp</span> -r <span class="string">&quot;<span class="variable">$app_src</span>&quot;</span>/* <span class="string">&quot;<span class="variable">$web_root</span>&quot;</span>/</span><br><span class="line"></span><br><span class="line"><span class="comment"># 启动服务</span></span><br><span class="line">systemctl restart nginx</span><br></pre></td></tr></table></figure></div>
+
+<h2 id="学习建议"><a href="#学习建议" class="headerlink" title="学习建议"></a>学习建议</h2><ul>
+<li>每天写一点脚本，练习常用命令。</li>
+<li>阅读他人的脚本，理解其中的逻辑。</li>
+<li>遇到问题先试着手动操作，再用脚本封装。</li>
+</ul>
+<p>Shell 是一把瑞士军刀，为 Linux 运维带来无限可能。熟练掌握后，你可以把重复工作交给脚本，专注更高价值的任务。</p>
+<h2 id="扩展概念"><a href="#扩展概念" class="headerlink" title="扩展概念"></a>扩展概念</h2><ul>
+<li><strong>Shell 与终端</strong>：终端 (Terminal) 是显示和输入界面，Shell 是真正解析命令的程序。常见 Shell 有 Bash、Zsh 等。</li>
+<li><strong>Shebang</strong>：脚本第一行 <code>#!/bin/bash</code> 指定用哪个解释器运行，这是让脚本能够直接执行的关键。</li>
+<li><strong>交互式与非交互式</strong>：登录后手动输入命令属于交互式，定时任务或脚本调用则是非交互式，需要确保变量与环境正确。</li>
+<li><strong>管道与重定向</strong>：使用 <code>|</code> 把多个命令连接成流水线，<code>&gt;</code> 或 <code>&gt;&gt;</code> 把输出写入文件，是构建复杂流程的核心方式。</li>
+</ul>
+<h2 id="企业常用脚本案例"><a href="#企业常用脚本案例" class="headerlink" title="企业常用脚本案例"></a>企业常用脚本案例</h2><h3 id="1-服务健康检查"><a href="#1-服务健康检查" class="headerlink" title="1. 服务健康检查"></a>1. 服务健康检查</h3><div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line">url=<span class="string">&quot;https://example.com/health&quot;</span></span><br><span class="line">status=$(curl -s -o /dev/null -w <span class="string">&quot;%&#123;http_code&#125;&quot;</span> <span class="string">&quot;<span class="variable">$url</span>&quot;</span>)</span><br><span class="line"><span class="keyword">if</span> [ <span class="string">&quot;<span class="variable">$status</span>&quot;</span> != <span class="string">&quot;200&quot;</span> ]; <span class="keyword">then</span></span><br><span class="line">  <span class="built_in">echo</span> <span class="string">&quot;[警告] 服务异常，状态码 <span class="variable">$status</span>&quot;</span> | mail -s <span class="string">&quot;Health Check&quot;</span> admin@example.com</span><br><span class="line"><span class="keyword">fi</span></span><br></pre></td></tr></table></figure></div>
+
+<h3 id="2-自动清理日志"><a href="#2-自动清理日志" class="headerlink" title="2. 自动清理日志"></a>2. 自动清理日志</h3><div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line">logdir=/var/log/myapp</span><br><span class="line">find <span class="string">&quot;<span class="variable">$logdir</span>&quot;</span> -name <span class="string">&quot;*.log&quot;</span> -mtime +7 -delete</span><br></pre></td></tr></table></figure></div>
+
+<h3 id="3-批量发布代码"><a href="#3-批量发布代码" class="headerlink" title="3. 批量发布代码"></a>3. 批量发布代码</h3><div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">servers=<span class="string">&quot;srv1 srv2 srv3&quot;</span></span><br><span class="line"><span class="keyword">for</span> h <span class="keyword">in</span> <span class="variable">$servers</span>; <span class="keyword">do</span></span><br><span class="line">  ssh <span class="variable">$h</span> <span class="string">&quot;cd /opt/app &amp;&amp; git pull &amp;&amp; systemctl restart app&quot;</span></span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure></div>
+
+<h3 id="4-数据备份同步"><a href="#4-数据备份同步" class="headerlink" title="4. 数据备份同步"></a>4. 数据备份同步</h3><div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line">src=/data</span><br><span class="line">remote=user@backup:/data</span><br><span class="line">rsync -avz <span class="string">&quot;<span class="variable">$src</span>&quot;</span> <span class="string">&quot;<span class="variable">$remote</span>&quot;</span></span><br></pre></td></tr></table></figure></div>
+
+<p>企业脚本往往围绕监控、备份、部署、清理等场景展开。实践中可以根据需要组合成完整的自动化流程。</p>
+
 		</div>
 
 		
@@ -448,7 +507,7 @@
         
             <li>
                 <strong>更新于
-                    :</strong> 2025-03-30 16:50:15
+                    :</strong> 2025-06-13 23:49:44
             </li>
         
         <li>
@@ -490,27 +549,27 @@
     <div class="recommended-article-header text-xl md:text-3xl font-bold mt-10">
      <i aria-hidden="true"></i><span>推荐阅读</span>
     </div>
-    <div class="recommended-article-group"><a class="recommended-article-item" href="/2025/03/26/Python/" title="Python" rel="bookmark">
-  <img src="/images/python.png" alt="Python" class="!max-w-none">
-  <span class="title">Python</span>
-</a><a class="recommended-article-item" href="/2025/04/23/Ansible/" title="Ansible" rel="bookmark">
-  <img src="/images/ansible.png" alt="Ansible" class="!max-w-none">
-  <span class="title">Ansible</span>
-</a><a class="recommended-article-item" href="/2025/06/12/MCP/" title="MCP 大模型上下文协议" rel="bookmark">
-  <img src="/images/wallhaven-wqery6-light.webp" alt="MCP 大模型上下文协议" class="!max-w-none">
-  <span class="title">MCP 大模型上下文协议</span>
+    <div class="recommended-article-group"><a class="recommended-article-item" href="/2025/03/26/Python/" title="Python 在 Linux 运维中的应用" rel="bookmark">
+  <img src="/images/python.png" alt="Python 在 Linux 运维中的应用" class="!max-w-none">
+  <span class="title">Python 在 Linux 运维中的应用</span>
+</a><a class="recommended-article-item" href="/2025/03/25/docker/" title="Docker" rel="bookmark">
+  <img src="/images/docker.webp" alt="Docker" class="!max-w-none">
+  <span class="title">Docker</span>
+</a><a class="recommended-article-item" href="/2025/04/13/CI-CD/" title="DevOps 世界的灵魂技术：CI/CD 流水线" rel="bookmark">
+  <img src="/images/cicd.png" alt="DevOps 世界的灵魂技术：CI/CD 流水线" class="!max-w-none">
+  <span class="title">DevOps 世界的灵魂技术：CI/CD 流水线</span>
 </a></div>
    </div>
    <div class="recommended-mobile">
    <div class="recommended-article-header text-xl md:text-3xl font-bold mt-10">
      <i aria-hidden="true"></i><span>推荐阅读</span>
    </div>
-   <div class="recommended-article-group"><a class="recommended-article-item" href="/2025/03/26/Python/" title="Python" rel="bookmark">
-  <img src="/images/python.png" alt="Python" class="!max-w-none">
-  <span class="title">Python</span>
-</a><a class="recommended-article-item" href="/2025/04/23/Ansible/" title="Ansible" rel="bookmark">
-  <img src="/images/ansible.png" alt="Ansible" class="!max-w-none">
-  <span class="title">Ansible</span>
+   <div class="recommended-article-group"><a class="recommended-article-item" href="/2025/03/26/Python/" title="Python 在 Linux 运维中的应用" rel="bookmark">
+  <img src="/images/python.png" alt="Python 在 Linux 运维中的应用" class="!max-w-none">
+  <span class="title">Python 在 Linux 运维中的应用</span>
+</a><a class="recommended-article-item" href="/2025/03/25/docker/" title="Docker" rel="bookmark">
+  <img src="/images/docker.webp" alt="Docker" class="!max-w-none">
+  <span class="title">Docker</span>
 </a></div>
    </div>
   </div>
@@ -534,7 +593,7 @@
 			<div class="article-next border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
 				<a class="next" rel="next" href="/2025/03/26/Python/">
 					<span class="title flex justify-center items-center">
-						<span class="post-nav-title-item">Python</span>
+						<span class="post-nav-title-item">Python 在 Linux 运维中的应用</span>
 						<span class="post-nav-item">下一篇</span>
 					</span>
 					<span class="right arrow-icon flex justify-center items-center">
@@ -599,7 +658,7 @@
 	<div class="post-toc">
 		<div class="toc-title">目录</div>
 		<div class="page-title">Shell</div>
-		
+		<ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF-Shell"><span class="nav-text">什么是 Shell</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E8%BF%90%E7%BB%B4%E8%A6%81%E5%AD%A6-Shell"><span class="nav-text">为什么运维要学 Shell</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E4%B8%80%E4%B8%AA%E8%84%9A%E6%9C%AC"><span class="nav-text">第一个脚本</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E8%AF%AD%E6%B3%95"><span class="nav-text">基本语法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%98%E9%87%8F%E4%B8%8E%E5%AD%97%E7%AC%A6%E4%B8%B2"><span class="nav-text">变量与字符串</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9D%A1%E4%BB%B6%E5%88%A4%E6%96%AD"><span class="nav-text">条件判断</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BE%AA%E7%8E%AF"><span class="nav-text">循环</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#for"><span class="nav-text">for</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#while"><span class="nav-text">while</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%87%BD%E6%95%B0"><span class="nav-text">函数</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81%E8%BF%90%E7%BB%B4%E5%9C%BA%E6%99%AF"><span class="nav-text">常见运维场景</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%89%B9%E9%87%8F%E6%89%A7%E8%A1%8C%E5%91%BD%E4%BB%A4"><span class="nav-text">批量执行命令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%97%A5%E5%BF%97%E7%9B%91%E6%8E%A7"><span class="nav-text">日志监控</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%87%AA%E5%8A%A8%E5%A4%87%E4%BB%BD"><span class="nav-text">自动备份</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%87%AA%E5%8A%A8%E5%8C%96%E6%8A%80%E5%B7%A7"><span class="nav-text">自动化技巧</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E6%88%98%E7%A4%BA%E4%BE%8B%EF%BC%9A%E4%B8%80%E9%94%AE%E9%83%A8%E7%BD%B2-Web-%E6%9C%8D%E5%8A%A1"><span class="nav-text">实战示例：一键部署 Web 服务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%A6%E4%B9%A0%E5%BB%BA%E8%AE%AE"><span class="nav-text">学习建议</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%89%A9%E5%B1%95%E6%A6%82%E5%BF%B5"><span class="nav-text">扩展概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BC%81%E4%B8%9A%E5%B8%B8%E7%94%A8%E8%84%9A%E6%9C%AC%E6%A1%88%E4%BE%8B"><span class="nav-text">企业常用脚本案例</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E6%9C%8D%E5%8A%A1%E5%81%A5%E5%BA%B7%E6%A3%80%E6%9F%A5"><span class="nav-text">1. 服务健康检查</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E8%87%AA%E5%8A%A8%E6%B8%85%E7%90%86%E6%97%A5%E5%BF%97"><span class="nav-text">2. 自动清理日志</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E6%89%B9%E9%87%8F%E5%8F%91%E5%B8%83%E4%BB%A3%E7%A0%81"><span class="nav-text">3. 批量发布代码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E6%95%B0%E6%8D%AE%E5%A4%87%E4%BB%BD%E5%90%8C%E6%AD%A5"><span class="nav-text">4. 数据备份同步</span></a></li></ol></li></ol>
 
 	</div>
 </div>
