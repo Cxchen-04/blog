@@ -144,3 +144,47 @@ systemctl restart nginx
 - 遇到问题先试着手动操作，再用脚本封装。
 
 Shell 是一把瑞士军刀，为 Linux 运维带来无限可能。熟练掌握后，你可以把重复工作交给脚本，专注更高价值的任务。
+
+
+## 扩展概念
+- **Shell 与终端**：终端 (Terminal) 是显示和输入界面，Shell 是真正解析命令的程序。常见 Shell 有 Bash、Zsh 等。
+- **Shebang**：脚本第一行 `#!/bin/bash` 指定用哪个解释器运行，这是让脚本能够直接执行的关键。
+- **交互式与非交互式**：登录后手动输入命令属于交互式，定时任务或脚本调用则是非交互式，需要确保变量与环境正确。
+- **管道与重定向**：使用 `|` 把多个命令连接成流水线，`>` 或 `>>` 把输出写入文件，是构建复杂流程的核心方式。
+
+## 企业常用脚本案例
+### 1. 服务健康检查
+```bash
+#!/bin/bash
+url="https://example.com/health"
+status=$(curl -s -o /dev/null -w "%{http_code}" "$url")
+if [ "$status" != "200" ]; then
+  echo "[警告] 服务异常，状态码 $status" | mail -s "Health Check" admin@example.com
+fi
+```
+
+### 2. 自动清理日志
+```bash
+#!/bin/bash
+logdir=/var/log/myapp
+find "$logdir" -name "*.log" -mtime +7 -delete
+```
+
+### 3. 批量发布代码
+```bash
+servers="srv1 srv2 srv3"
+for h in $servers; do
+  ssh $h "cd /opt/app && git pull && systemctl restart app"
+done
+```
+
+### 4. 数据备份同步
+```bash
+#!/bin/bash
+src=/data
+remote=user@backup:/data
+rsync -avz "$src" "$remote"
+```
+
+企业脚本往往围绕监控、备份、部署、清理等场景展开。实践中可以根据需要组合成完整的自动化流程。
+
