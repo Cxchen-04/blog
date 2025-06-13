@@ -30,7 +30,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://www.luelulu.com/images/redefine-og.webp">
 <meta property="article:published_time" content="2025-04-13T07:19:50.000Z">
-<meta property="article:modified_time" content="2025-05-28T06:31:36.512Z">
+<meta property="article:modified_time" content="2025-06-12T10:59:17.223Z">
 <meta property="article:author" content="神秘路痴">
 <meta property="article:tag" content="运维">
 <meta property="article:tag" content="k8s">
@@ -302,15 +302,15 @@
 
         <div class="statistics flex justify-around my-2.5">
     <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/tags">
-        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">8</div>
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">10</div>
         <div class="label text-third-text-color text-sm">标签</div>
     </a>
     <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/categories">
-        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">9</div>
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">11</div>
         <div class="label text-third-text-color text-sm">分类</div>
     </a>
     <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/archives">
-        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">8</div>
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">9</div>
         <div class="label text-third-text-color text-sm">文章</div>
     </a>
 </div>
@@ -365,8 +365,8 @@
     
         <span class="article-date article-meta-item">
             <i class="fa-regular fa-wrench"></i>&nbsp;
-            <span class="desktop">2025-05-28 14:31:36</span>
-            <span class="mobile">2025-05-28 14:31:36</span>
+            <span class="desktop">2025-06-12 18:59:17</span>
+            <span class="mobile">2025-06-12 18:59:17</span>
             <span class="hover-info">更新</span>
         </span>
     
@@ -1089,6 +1089,140 @@
 <td><code>kubectl get deployment &lt;name&gt; -o yaml &gt; deployment.yaml</code></td>
 </tr>
 </tbody></table>
+<h2 id="Helm-K8s的「包管理工具」"><a href="#Helm-K8s的「包管理工具」" class="headerlink" title="Helm K8s的「包管理工具」"></a>Helm K8s的「包管理工具」</h2><h3 id="什么是-Chart？它有什么作用？"><a href="#什么是-Chart？它有什么作用？" class="headerlink" title="什么是 Chart？它有什么作用？"></a>什么是 Chart？它有什么作用？</h3><p>Chart 是 Helm 的核心概念，简单说就是：</p>
+<p>Chart 是一个打包好的 Kubernetes 应用模板，包含了一组 YAML 文件 + 参数配置文件。</p>
+<p>一个 Chart 包含的内容通常如下：</p>
+<div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">mychart/</span><br><span class="line">├── Chart.yaml           <span class="comment"># Chart 的元信息（名称、版本等）</span></span><br><span class="line">├── values.yaml          <span class="comment"># 默认参数（可被 -f 覆盖）</span></span><br><span class="line">├── templates/           <span class="comment"># 存放实际的 YAML 模板</span></span><br><span class="line">│   ├── deployment.yaml</span><br><span class="line">│   ├── service.yaml</span><br><span class="line">│   └── _helpers.tpl     <span class="comment"># 公共模板函数</span></span><br></pre></td></tr></table></figure></div>
+<p>Chart 的作用：</p>
+<table>
+<thead>
+<tr>
+<th>作用</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>📦 打包</td>
+<td>把一套复杂的部署逻辑（Deployment、Service、Ingress 等）统一封装</td>
+</tr>
+<tr>
+<td>🔁 复用</td>
+<td>你可以反复在不同集群、不同环境中使用它，只需要传不同参数</td>
+</tr>
+<tr>
+<td>🧩 参数化</td>
+<td>通过 <code>values.yaml</code> 配置文件，灵活控制副本数、镜像、端口等</td>
+</tr>
+<tr>
+<td>🔍 版本管理</td>
+<td>Chart 支持版本控制，与 Helm release 一起回滚升级</td>
+</tr>
+<tr>
+<td>🚀 快速部署</td>
+<td>一条命令即可部署复杂应用（例如 Loki、Prometheus、GitLab 等）</td>
+</tr>
+</tbody></table>
+<h3 id="helm命令"><a href="#helm命令" class="headerlink" title="helm命令"></a>helm命令</h3><h5 id="📦-Chart-仓库管理"><a href="#📦-Chart-仓库管理" class="headerlink" title="📦 Chart 仓库管理"></a>📦 Chart 仓库管理</h5><div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">helm repo add &lt;name&gt; &lt;url&gt;             <span class="comment"># 添加 Helm 仓库</span></span><br><span class="line">helm repo list                         <span class="comment"># 查看已添加的仓库</span></span><br><span class="line">helm repo update                       <span class="comment"># 更新仓库信息</span></span><br><span class="line">helm search repo &lt;keyword&gt;             <span class="comment"># 在仓库中搜索 chart</span></span><br></pre></td></tr></table></figure></div>
+<h5 id="📥-安装-升级"><a href="#📥-安装-升级" class="headerlink" title="📥 安装 &#x2F; 升级"></a>📥 安装 &#x2F; 升级</h5><div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">helm install &lt;release-name&gt; &lt;chart&gt; -n &lt;namespace&gt; -f &lt;values.yaml&gt;</span><br><span class="line"><span class="comment"># 安装一个 chart，比如：</span></span><br><span class="line"><span class="comment"># helm install loki grafana/loki-stack -n monitor -f loki-values.yaml</span></span><br><span class="line"></span><br><span class="line">helm upgrade &lt;release-name&gt; &lt;chart&gt; -n &lt;namespace&gt; -f &lt;values.yaml&gt;</span><br><span class="line"><span class="comment"># 升级已有的 release，但不会自动安装</span></span><br><span class="line"></span><br><span class="line">helm upgrade --install &lt;release-name&gt; &lt;chart&gt; ...</span><br><span class="line"><span class="comment"># 安装或升级（推荐用于脚本或 CI/CD）</span></span><br><span class="line"></span><br><span class="line">helm uninstall &lt;release-name&gt; -n &lt;namespace&gt;</span><br><span class="line"><span class="comment"># 卸载 release</span></span><br><span class="line"></span><br><span class="line">helm rollback &lt;release-name&gt; &lt;revision&gt; -n &lt;namespace&gt;</span><br><span class="line"><span class="comment"># 回滚到历史版本</span></span><br></pre></td></tr></table></figure></div>
+<h5 id="🔍-状态-日志-调试"><a href="#🔍-状态-日志-调试" class="headerlink" title="🔍 状态 &#x2F; 日志 &#x2F; 调试"></a>🔍 状态 &#x2F; 日志 &#x2F; 调试</h5><div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">helm list -n &lt;namespace&gt;             <span class="comment"># 查看某个命名空间下的 release</span></span><br><span class="line">helm status &lt;release-name&gt; -n &lt;namespace&gt;  <span class="comment"># 查看 release 状态</span></span><br><span class="line">helm get values &lt;release-name&gt; -n &lt;namespace&gt;       <span class="comment"># 查看已部署时使用的 values</span></span><br><span class="line">helm get manifest &lt;release-name&gt; -n &lt;namespace&gt;     <span class="comment"># 查看渲染后的 Kubernetes YAML</span></span><br><span class="line">helm <span class="built_in">history</span> &lt;release-name&gt; -n &lt;namespace&gt;          <span class="comment"># 查看历史版本</span></span><br></pre></td></tr></table></figure></div>
+
+<h2 id="Kustomize-是什么"><a href="#Kustomize-是什么" class="headerlink" title="Kustomize 是什么"></a>Kustomize 是什么</h2><p>🧩 一句话总结 Helm 与 Kustomize 的区别：</p>
+<p>Helm 是“打包部署模板”系统，Kustomize 是“YAML 衍生变种”系统。</p>
+<p>📦 Kustomize 是什么？</p>
+<p>Kustomize 是 Kubernetes 原生支持的配置管理工具（kubectl 从 1.14 起内置支持），它通过覆盖和组合 YAML 文件来实现“相同基础、不同环境”的部署配置。</p>
+<p>你不用写模板语法（像 Helm 的 { { } } ），而是通过文件夹 + patch 的形式组合 YAML。</p>
+<p>🧱 Kustomize 的结构（典型目录示例）：</p>
+<div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">my-app/</span><br><span class="line">├── base/   <span class="comment"># 基础部署逻辑，适用于所有环境</span></span><br><span class="line">│   ├── deployment.yaml</span><br><span class="line">│   ├── service.yaml</span><br><span class="line">│   └── kustomization.yaml</span><br><span class="line">├── overlays/  <span class="comment"># 环境专属配置，通过 patch 或变量覆盖基础配置</span></span><br><span class="line">│   ├── dev/</span><br><span class="line">│   │   ├── kustomization.yaml</span><br><span class="line">│   │   └── patch.yaml</span><br><span class="line">│   ├── prod/</span><br><span class="line">│   │   ├── kustomization.yaml</span><br><span class="line">│   │   └── patch.yaml</span><br></pre></td></tr></table></figure></div>
+
+<p>📌 Kustomize 支持的功能：</p>
+<table>
+<thead>
+<tr>
+<th>功能</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>namePrefix &#x2F; nameSuffix</td>
+<td>给资源名加前缀 &#x2F; 后缀，避免冲突</td>
+</tr>
+<tr>
+<td>configMapGenerator &#x2F; secretGenerator</td>
+<td>自动生成 ConfigMap &#x2F; Secret</td>
+</tr>
+<tr>
+<td>patchesStrategicMerge</td>
+<td>部分字段打补丁</td>
+</tr>
+<tr>
+<td>images 替换</td>
+<td>可以指定镜像版本</td>
+</tr>
+<tr>
+<td>资源合并 &#x2F; 继承</td>
+<td>支持多层嵌套管理 base 和 overlay</td>
+</tr>
+</tbody></table>
+<p>🔍 Helm vs Kustomize：核心对比表</p>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>Helm</th>
+<th>Kustomize</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>模板机制</td>
+<td>Go 模板语法 <code>&#123;&#123; &#125;&#125;</code>，灵活但复杂</td>
+<td>原生 YAML + Patch，简单直观</td>
+</tr>
+<tr>
+<td>应用封装</td>
+<td>支持 Chart 打包，版本控制</td>
+<td>无打包，仅结构化组织目录</td>
+</tr>
+<tr>
+<td>参数注入方式</td>
+<td>values.yaml</td>
+<td>patch.yaml + kustomization.yaml</td>
+</tr>
+<tr>
+<td>适合场景</td>
+<td>第三方应用部署（如 Prometheus、Harbor）</td>
+<td>自研项目多环境管理（如 dev&#x2F;test&#x2F;prod）</td>
+</tr>
+<tr>
+<td>发布版本回滚</td>
+<td>Helm 有 Release 管理，支持版本和回滚</td>
+<td>无 Release 概念，靠 Git 控制</td>
+</tr>
+<tr>
+<td>安装方式</td>
+<td><code>helm install</code></td>
+<td><code>kubectl apply -k</code> 或 <code>kustomize build</code></td>
+</tr>
+</tbody></table>
+<p>🧠 可以这样记：<br>Helm 更像是：yum &#x2F; apt —— 安装别人做好的包（官方、第三方组件）<br>    •	Kustomize 更像是：自己写 docker-compose.override.yml —— 在自己 YAML 基础上做灵活的环境变体管理</p>
+<p>🚀 举个实际例子</p>
+<div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 你在用 Helm 安装 Grafana：</span></span><br><span class="line">helm install grafana grafana/grafana -f prod-values.yaml</span><br><span class="line"></span><br><span class="line"><span class="comment"># 你在用 Kustomize 部署自己开发的 app：</span></span><br><span class="line">kubectl apply -k overlays/prod</span><br></pre></td></tr></table></figure></div>
+
+
+<h2 id="K8s进阶"><a href="#K8s进阶" class="headerlink" title="K8s进阶"></a>K8s进阶</h2><p>① 调度相关<br>    •	NodeSelector &#x2F; Affinity &#x2F; Taints &amp; Tolerations：精细控制 Pod 在哪些节点上运行。<br>    •	nodeSelector：简单标签匹配。<br>    •	affinity：支持多条件、亲和&#x2F;反亲和调度。<br>    •	taints &amp; tolerations：用于“拒绝非特定容忍条件的 Pod”调度。<br>    •	优先级与抢占（Priority &amp; Preemption）：高优先级的 Pod 可以驱逐低优先级 Pod。</p>
+<p>⸻</p>
+<p>② 工作负载控制器<br>    •	StatefulSet：适用于有状态应用（如数据库），提供稳定的网络标识和持久存储。<br>    •	DaemonSet：确保每个节点都运行一个 Pod（常用于日志采集、监控等）。<br>    •	Job &#x2F; CronJob：一次性任务或周期性任务，类似 Linux 的 cron。<br>    •	Horizontal Pod Autoscaler（HPA）：根据 CPU 或自定义指标自动伸缩 Pod 数量。<br>    •	Vertical Pod Autoscaler（VPA）：自动调整 Pod 的资源请求（目前在很多场景下仍谨慎使用）。<br>    •	Cluster Autoscaler：节点资源不足时自动扩容底层节点。</p>
+<p>⸻</p>
+<p>③ 网络与服务发现<br>    •	NetworkPolicy：K8s 的防火墙，可以限制 Pod 间通信。<br>    •	Service Mesh（如 Istio、Linkerd）：用于流量管理、服务观察、熔断、A&#x2F;B 测试等高级服务治理。</p>
+<p>⸻</p>
+<p>④ 存储与数据管理<br>    •	StorageClass：定义不同的存储策略（慢速、高IO等），与 PVC 配合使用。<br>    •	VolumeSnapshot &#x2F; VolumeClone：实现 PVC 快照和克隆（适合备份、还原）。<br>    •	CSI（Container Storage Interface）：插件化的存储驱动标准，支持云厂商和自定义存储。</p>
+<p>⸻</p>
+<p>⑤ 安全<br>    •	RBAC（Role-Based Access Control）：基于角色的权限控制。<br>    •	PodSecurityPolicy（已废弃）&#x2F; Pod Security Admission：控制 Pod 的安全行为（如是否允许特权模式）。<br>    •	NetworkPolicy：限制网络访问权限。<br>    •	ServiceAccount &amp; Secrets：身份管理和加密敏感信息。</p>
+<p>⸻</p>
+<p>⑥ 可观测性与调试<br>    •	Events &#x2F; Probes &#x2F; Metrics API：诊断运行状况。<br>    •	日志采集：Loki &#x2F; ELK &#x2F; Fluentd &#x2F; Promtail：结合 DaemonSet 收集集群日志。<br>    •	Tracing：使用 Jaeger&#x2F;Zipkin 等进行分布式追踪。<br>    •	监控告警：Prometheus + Grafana + Alertmanager：完整的指标、告警、可视化体系。</p>
+<p>⸻</p>
+<p>⑦ 高级部署策略<br>    •	Canary &#x2F; Blue-Green &#x2F; RollingUpdate &#x2F; Recreate：支持多种升级策略。<br>    •	Kustomize &#x2F; Helm：更强大的资源打包和管理方式，适合复杂项目。</p>
+<p>⸻</p>
+<p>⑧ 平台扩展能力<br>    •	Operator（CRD + Controller）：自定义控制器管理非原生资源，比如部署自己的数据库、缓存。<br>    •	Webhooks（Mutating &#x2F; Validating）：用来在资源创建前做拦截和修改。<br>    •	Admission Controller：控制资源创建和更新的“守门员”。</p>
 
 		</div>
 
@@ -1103,7 +1237,7 @@
         
             <li>
                 <strong>更新于
-                    :</strong> 2025-05-28 14:31:36
+                    :</strong> 2025-06-12 18:59:17
             </li>
         
         <li>
@@ -1145,27 +1279,27 @@
     <div class="recommended-article-header text-xl md:text-3xl font-bold mt-10">
      <i aria-hidden="true"></i><span>推荐阅读</span>
     </div>
-    <div class="recommended-article-group"><a class="recommended-article-item" href="/2025/04/23/Ansible/" title="Ansible" rel="bookmark">
-  <img src="/images/ansible.png" alt="Ansible" class="!max-w-none">
-  <span class="title">Ansible</span>
-</a><a class="recommended-article-item" href="/2025/03/25/docker/" title="Docker" rel="bookmark">
+    <div class="recommended-article-group"><a class="recommended-article-item" href="/2025/03/25/docker/" title="Docker" rel="bookmark">
   <img src="/images/docker.webp" alt="Docker" class="!max-w-none">
   <span class="title">Docker</span>
-</a><a class="recommended-article-item" href="/2025/05/24/issuer/" title="Docker/Kubernetes内网生产环境导致镜像无法拉取" rel="bookmark">
-  <img src="/images/wallhaven-wqery6-light.webp" alt="Docker/Kubernetes内网生产环境导致镜像无法拉取" class="!max-w-none">
-  <span class="title">Docker/Kubernetes内网生产环境导致镜像无法拉取</span>
+</a><a class="recommended-article-item" href="/2025/04/23/Ansible/" title="Ansible" rel="bookmark">
+  <img src="/images/ansible.png" alt="Ansible" class="!max-w-none">
+  <span class="title">Ansible</span>
+</a><a class="recommended-article-item" href="/2025/04/13/CI-CD/" title="DevOps 世界的灵魂技术：CI/CD 流水线" rel="bookmark">
+  <img src="/images/cicd.png" alt="DevOps 世界的灵魂技术：CI/CD 流水线" class="!max-w-none">
+  <span class="title">DevOps 世界的灵魂技术：CI/CD 流水线</span>
 </a></div>
    </div>
    <div class="recommended-mobile">
    <div class="recommended-article-header text-xl md:text-3xl font-bold mt-10">
      <i aria-hidden="true"></i><span>推荐阅读</span>
    </div>
-   <div class="recommended-article-group"><a class="recommended-article-item" href="/2025/04/23/Ansible/" title="Ansible" rel="bookmark">
-  <img src="/images/ansible.png" alt="Ansible" class="!max-w-none">
-  <span class="title">Ansible</span>
-</a><a class="recommended-article-item" href="/2025/03/25/docker/" title="Docker" rel="bookmark">
+   <div class="recommended-article-group"><a class="recommended-article-item" href="/2025/03/25/docker/" title="Docker" rel="bookmark">
   <img src="/images/docker.webp" alt="Docker" class="!max-w-none">
   <span class="title">Docker</span>
+</a><a class="recommended-article-item" href="/2025/04/23/Ansible/" title="Ansible" rel="bookmark">
+  <img src="/images/ansible.png" alt="Ansible" class="!max-w-none">
+  <span class="title">Ansible</span>
 </a></div>
    </div>
   </div>
@@ -1254,7 +1388,7 @@
 	<div class="post-toc">
 		<div class="toc-title">目录</div>
 		<div class="page-title">Kubernetes / K8s</div>
-		<ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-text">简介</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BC%80%E5%A7%8B%E5%89%8D"><span class="nav-text">开始前</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Cluster-%E9%9B%86%E7%BE%A4"><span class="nav-text">Cluster 集群</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#k8s%E4%B8%AD%E7%9A%84%E2%80%9C%E9%9B%86%E7%BE%A4%E7%BB%93%E6%9E%84%E5%9B%BE%E2%80%9D"><span class="nav-text">k8s中的“集群结构图”</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#k8s%E8%A7%A3%E5%86%B3%E4%BA%86%E4%BB%80%E4%B9%88%E9%97%AE%E9%A2%98%EF%BC%9F"><span class="nav-text">k8s解决了什么问题？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BF%85%E9%A1%BB%E7%9F%A5%E9%81%93%E7%9A%84%E6%A0%B8%E5%BF%83%E6%A6%82%E5%BF%B5"><span class="nav-text">必须知道的核心概念</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BF%85%E9%A1%BB%E7%9F%A5%E9%81%93%E7%9A%84%E5%AE%B9%E5%99%A8%E6%A6%82%E5%BF%B5"><span class="nav-text">必须知道的容器概念</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%85K8s-%E7%94%9F%E4%BA%A7%E7%8E%AF%E5%A2%83"><span class="nav-text">安装K8s 生产环境</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%89%8D%E6%8F%90"><span class="nav-text">前提</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%89%E8%A3%85-k8s"><span class="nav-text">安装 k8s</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#crictl-%E5%92%8C-nerdctl"><span class="nav-text">crictl 和 nerdctl</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%85K8S-%E5%86%85%E7%BD%91%E7%94%9F%E4%BA%A7%E7%8E%AF%E5%A2%83"><span class="nav-text">安装K8S 内网生产环境</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%87%86%E5%A4%87%E5%B7%A5%E4%BD%9C"><span class="nav-text">准备工作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%83%A8%E7%BD%B2-K8S"><span class="nav-text">部署 K8S</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%85K8s-nimikube-%E5%AD%A6%E4%B9%A0%E6%B5%8B%E8%AF%95%E7%89%88%E6%9C%AC"><span class="nav-text">安装K8s nimikube 学习测试版本</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#K8s%E5%91%BD%E4%BB%A4"><span class="nav-text">K8s命令</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%F0%9F%A7%AD-%E9%9B%86%E7%BE%A4%E4%B8%8E%E4%B8%8A%E4%B8%8B%E6%96%87%E7%AE%A1%E7%90%86"><span class="nav-text">🧭 集群与上下文管理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%F0%9F%93%A6-%E8%B5%84%E6%BA%90%E7%AE%A1%E7%90%86%EF%BC%88Pod%E3%80%81Deployment%E3%80%81Service%EF%BC%89"><span class="nav-text">📦 资源管理（Pod、Deployment、Service）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%F0%9F%94%8D-%E6%9F%A5%E7%9C%8B%E4%B8%8E%E8%B0%83%E8%AF%95"><span class="nav-text">🔍 查看与调试</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%F0%9F%A7%B1-%E5%91%BD%E5%90%8D%E7%A9%BA%E9%97%B4%E7%AE%A1%E7%90%86"><span class="nav-text">🧱 命名空间管理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%F0%9F%92%BE-%E5%AD%98%E5%82%A8%E7%AE%A1%E7%90%86%EF%BC%88PVC%E3%80%81PV%EF%BC%89"><span class="nav-text">💾 存储管理（PVC、PV）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%F0%9F%9B%A0-%E9%85%8D%E7%BD%AE%E7%AE%A1%E7%90%86%EF%BC%88ConfigMap%E3%80%81Secret%EF%BC%89"><span class="nav-text">🛠 配置管理（ConfigMap、Secret）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%F0%9F%93%88-%E7%BD%91%E7%BB%9C%E4%B8%8E%E6%9C%8D%E5%8A%A1%EF%BC%88Service%E3%80%81Ingress%EF%BC%89"><span class="nav-text">📈 网络与服务（Service、Ingress）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%F0%9F%A7%AA-%E4%B8%B4%E6%97%B6%E8%B0%83%E8%AF%95%E4%B8%8E%E5%AF%BC%E5%87%BA"><span class="nav-text">🧪 临时调试与导出</span></a></li></ol></li></ol>
+		<ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-text">简介</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BC%80%E5%A7%8B%E5%89%8D"><span class="nav-text">开始前</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Cluster-%E9%9B%86%E7%BE%A4"><span class="nav-text">Cluster 集群</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#k8s%E4%B8%AD%E7%9A%84%E2%80%9C%E9%9B%86%E7%BE%A4%E7%BB%93%E6%9E%84%E5%9B%BE%E2%80%9D"><span class="nav-text">k8s中的“集群结构图”</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#k8s%E8%A7%A3%E5%86%B3%E4%BA%86%E4%BB%80%E4%B9%88%E9%97%AE%E9%A2%98%EF%BC%9F"><span class="nav-text">k8s解决了什么问题？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BF%85%E9%A1%BB%E7%9F%A5%E9%81%93%E7%9A%84%E6%A0%B8%E5%BF%83%E6%A6%82%E5%BF%B5"><span class="nav-text">必须知道的核心概念</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BF%85%E9%A1%BB%E7%9F%A5%E9%81%93%E7%9A%84%E5%AE%B9%E5%99%A8%E6%A6%82%E5%BF%B5"><span class="nav-text">必须知道的容器概念</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%85K8s-%E7%94%9F%E4%BA%A7%E7%8E%AF%E5%A2%83"><span class="nav-text">安装K8s 生产环境</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%89%8D%E6%8F%90"><span class="nav-text">前提</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%89%E8%A3%85-k8s"><span class="nav-text">安装 k8s</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#crictl-%E5%92%8C-nerdctl"><span class="nav-text">crictl 和 nerdctl</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%85K8S-%E5%86%85%E7%BD%91%E7%94%9F%E4%BA%A7%E7%8E%AF%E5%A2%83"><span class="nav-text">安装K8S 内网生产环境</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%87%86%E5%A4%87%E5%B7%A5%E4%BD%9C"><span class="nav-text">准备工作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%83%A8%E7%BD%B2-K8S"><span class="nav-text">部署 K8S</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%85K8s-nimikube-%E5%AD%A6%E4%B9%A0%E6%B5%8B%E8%AF%95%E7%89%88%E6%9C%AC"><span class="nav-text">安装K8s nimikube 学习测试版本</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#K8s%E5%91%BD%E4%BB%A4"><span class="nav-text">K8s命令</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%F0%9F%A7%AD-%E9%9B%86%E7%BE%A4%E4%B8%8E%E4%B8%8A%E4%B8%8B%E6%96%87%E7%AE%A1%E7%90%86"><span class="nav-text">🧭 集群与上下文管理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%F0%9F%93%A6-%E8%B5%84%E6%BA%90%E7%AE%A1%E7%90%86%EF%BC%88Pod%E3%80%81Deployment%E3%80%81Service%EF%BC%89"><span class="nav-text">📦 资源管理（Pod、Deployment、Service）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%F0%9F%94%8D-%E6%9F%A5%E7%9C%8B%E4%B8%8E%E8%B0%83%E8%AF%95"><span class="nav-text">🔍 查看与调试</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%F0%9F%A7%B1-%E5%91%BD%E5%90%8D%E7%A9%BA%E9%97%B4%E7%AE%A1%E7%90%86"><span class="nav-text">🧱 命名空间管理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%F0%9F%92%BE-%E5%AD%98%E5%82%A8%E7%AE%A1%E7%90%86%EF%BC%88PVC%E3%80%81PV%EF%BC%89"><span class="nav-text">💾 存储管理（PVC、PV）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%F0%9F%9B%A0-%E9%85%8D%E7%BD%AE%E7%AE%A1%E7%90%86%EF%BC%88ConfigMap%E3%80%81Secret%EF%BC%89"><span class="nav-text">🛠 配置管理（ConfigMap、Secret）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%F0%9F%93%88-%E7%BD%91%E7%BB%9C%E4%B8%8E%E6%9C%8D%E5%8A%A1%EF%BC%88Service%E3%80%81Ingress%EF%BC%89"><span class="nav-text">📈 网络与服务（Service、Ingress）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%F0%9F%A7%AA-%E4%B8%B4%E6%97%B6%E8%B0%83%E8%AF%95%E4%B8%8E%E5%AF%BC%E5%87%BA"><span class="nav-text">🧪 临时调试与导出</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Helm-K8s%E7%9A%84%E3%80%8C%E5%8C%85%E7%AE%A1%E7%90%86%E5%B7%A5%E5%85%B7%E3%80%8D"><span class="nav-text">Helm K8s的「包管理工具」</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF-Chart%EF%BC%9F%E5%AE%83%E6%9C%89%E4%BB%80%E4%B9%88%E4%BD%9C%E7%94%A8%EF%BC%9F"><span class="nav-text">什么是 Chart？它有什么作用？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#helm%E5%91%BD%E4%BB%A4"><span class="nav-text">helm命令</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Kustomize-%E6%98%AF%E4%BB%80%E4%B9%88"><span class="nav-text">Kustomize 是什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#K8s%E8%BF%9B%E9%98%B6"><span class="nav-text">K8s进阶</span></a></li></ol>
 
 	</div>
 </div>
@@ -1281,7 +1415,7 @@
                 
                 <p class="post-count space-x-0.5">
                     <span>
-                        共撰写了 8 篇文章
+                        共撰写了 9 篇文章
                     </span>
                     
                 </p>
